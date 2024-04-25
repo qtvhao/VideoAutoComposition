@@ -12,7 +12,7 @@ def intro(template_folder, placed_texts):
     if not os.path.exists(texts_config_file):
         texts = {}
         texts["texts"] = []
-        texts["texts"].append({"text": "THIS MONDAY | 3:40 PM", "position": [30, 245], "timeline_cursor": 3.2, "height": 21, "text_color": "#ffffff"})
+        texts["texts"].append({"text": "THIS MONDAY | 3:40 PM", "position": [125, 485], "timeline_cursor": 3.2, "height": 21, "text_color": "#ffffff"})
 # 
         texts["texts"].append({"text": "@Kiến thức Sundayyyyyyyyy", "position": [125, 80], "timeline_cursor": 4.2, "height": 21, "text_color": "#ffffff"})
         texts["texts"].append({"text": "Accounting Management in Luong Binh", "position": [180, 129], "timeline_cursor": 1.2, "height": 60, "text_color": "#ffffff"})
@@ -34,17 +34,19 @@ def intro(template_folder, placed_texts):
     for text in texts["texts"]:
         print(text["text"], text["position"], text["timeline_cursor"])
         text_content = text["text"]
-        # Split words by space
-        text_content = text_content.split(" ")
-        # Chunk words by 3 words
-        text_content = [text_content[i:i + 3] for i in range(0, len(text_content), 3)]
-        # Join words by \n
-        text_content = "\n".join([" ".join(text) for text in text_content])
 
         text_position = text["position"]
         timeline_cursor = text["timeline_cursor"]
         height = text["height"]
         text_color = text["text_color"]
+        # 
+        if height > 50:
+            # Split words by space
+            text_content = text_content.split(" ")
+            # Chunk words by 3 words
+            text_content = [text_content[i:i + 3] for i in range(0, len(text_content), 3)]
+            # Join words by \n
+            text_content = "\n".join([" ".join(text) for text in text_content])
         # 
         print("text_content", text_content)
         print("text_position", text_position)
@@ -70,5 +72,4 @@ def intro(template_folder, placed_texts):
         shutil.move(tmp_output_file, output_file)
 
         print("output_file", output_file)
-        break
 
