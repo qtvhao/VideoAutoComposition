@@ -25,7 +25,15 @@ RUN . venv/bin/activate && apt-get update && apt-get install -y \
 # 
 COPY requirements.txt ./
 RUN python -m venv venv && . venv/bin/activate && pip install --no-cache-dir -r requirements.txt
-    # Install dependencies
-# RUN pip install --no-cache-dir -r requirements.txt
+RUN cat /etc/ImageMagick-6/policy.xml | sed 's/none/read,write/g'> /etc/ImageMagick-6/policy.xml
 
-# Copy the current directory contents into the container at /app
+# Add font Courier, Arial
+RUN apt-get update && apt-get install -y \
+    fonts-liberation \
+    fonts-dejavu \
+    fonts-freefont-ttf \
+    fonts-ipafont-gothic \
+    fonts-ipafont-mincho \
+    fonts-wqy-zenhei \
+    fonts-wqy-microhei \
+    && rm -rf /var/lib/apt/lists/*

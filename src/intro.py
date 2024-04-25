@@ -43,8 +43,8 @@ def intro(template_folder, placed_texts):
         video = moviepy.VideoFileClip(template_folder + mp4_file)
         #
         # Add text
-        txt_clip = moviepy.TextClip(text_content, fontsize=70, color='white')
-        txt_clip = txt_clip.set_pos(text_position)
+        txt_clip = moviepy.TextClip(text_content, fontsize=70, color='white', bg_color='black', font="DejaVu-Sans-Bold")
+        # txt_clip = txt_clip.set_pos(text_position)
         txt_clip = txt_clip.set_duration(video.duration)
         txt_clip = txt_clip.set_start(timeline_cursor)
         video = moviepy.CompositeVideoClip([video, txt_clip])
