@@ -12,9 +12,10 @@ def intro(template_folder, placed_texts):
     if not os.path.exists(texts_config_file):
         texts = {}
         texts["texts"] = []
-        texts["texts"].append({"text": "@Kiến thức Sunday", "position": [125, 80], "timeline_cursor": 4.2, "height": 21, "text_color": "#ffffff"})
-        texts["texts"].append({"text": "LET’S TALK", "position": [228, 99], "timeline_cursor": 1.2, "height": 96, "text_color": "#ffffff"})
         texts["texts"].append({"text": "THIS MONDAY | 3:40 PM", "position": [30, 245], "timeline_cursor": 3.2, "height": 21, "text_color": "#ffffff"})
+# 
+        texts["texts"].append({"text": "@Kiến thức Sundayyyyyyyyy", "position": [125, 80], "timeline_cursor": 4.2, "height": 21, "text_color": "#ffffff"})
+        texts["texts"].append({"text": "Accounting Management in Luong Binh", "position": [180, 129], "timeline_cursor": 1.2, "height": 60, "text_color": "#ffffff"})
         with open(texts_config_file, 'w') as outfile:
             json.dump(texts, outfile)
     else:
@@ -33,6 +34,13 @@ def intro(template_folder, placed_texts):
     for text in texts["texts"]:
         print(text["text"], text["position"], text["timeline_cursor"])
         text_content = text["text"]
+        # Split words by space
+        text_content = text_content.split(" ")
+        # Chunk words by 3 words
+        text_content = [text_content[i:i + 3] for i in range(0, len(text_content), 3)]
+        # Join words by \n
+        text_content = "\n".join([" ".join(text) for text in text_content])
+
         text_position = text["position"]
         timeline_cursor = text["timeline_cursor"]
         height = text["height"]
@@ -50,7 +58,7 @@ def intro(template_folder, placed_texts):
         video = moviepy.VideoFileClip(output_file)
         #
         # Add text
-        txt_clip = moviepy.TextClip(text_content, fontsize=height * 1.5, color=text_color, font="DejaVu-Sans-Bold")
+        txt_clip = moviepy.TextClip(text_content, fontsize=height * 1.5, color=text_color, font="DejaVu-Sans-Bold", align='West')
         txt_clip = txt_clip.set_position([text_position[0], text_position[1] + height])
         video_duration_subtract_timeline_cursor = video.duration - timeline_cursor
         txt_clip = txt_clip.set_duration(video_duration_subtract_timeline_cursor)
