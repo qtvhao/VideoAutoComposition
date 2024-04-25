@@ -1,6 +1,6 @@
 import os
 import json
-from ...moviepy import VideoFileClip, TextClip, CompositeVideoClip
+import moviepy.editor as moviepy
 import random
 def intro(template_folder, placed_texts):
     mp4_file = [f for f in os.listdir(template_folder) if f.endswith('.mp4')][0]
@@ -40,14 +40,14 @@ def intro(template_folder, placed_texts):
         #
         random5 = ''.join(random.choices('0123456789', k=5))
         output_file = output_folder + "output_" + random5 + ".mp4"
-        video = VideoFileClip(template_folder + mp4_file)
+        video = moviepy.VideoFileClip(template_folder + mp4_file)
         #
         # Add text
-        txt_clip = TextClip(text_content, fontsize=70, color='white')
+        txt_clip = moviepy.TextClip(text_content, fontsize=70, color='white')
         txt_clip = txt_clip.set_pos(text_position)
         txt_clip = txt_clip.set_duration(video.duration)
         txt_clip = txt_clip.set_start(timeline_cursor)
-        video = CompositeVideoClip([video, txt_clip])
+        video = moviepy.CompositeVideoClip([video, txt_clip])
         video.write_videofile(output_file, codec='libx264')
 
         print("output_file", output_file)

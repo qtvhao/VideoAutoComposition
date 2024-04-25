@@ -8,15 +8,24 @@ WORKDIR /app
 ENV PYTHONPATH="/app"
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
+# RUN apt-get update && apt-get install -y \
+#     git \
+#     imagemagick \
+#     ffmpeg \
+#     && rm -rf /var/lib/apt/lists/*
+
+# pip 23.1
+RUN python -m venv venv && . venv/bin/activate && pip install --upgrade pip
+# python -m venv venv
+RUN . venv/bin/activate && apt-get update && apt-get install -y \
     git \
     imagemagick \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
-
+# 
 COPY requirements.txt ./
-
-# Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN python -m venv venv && . venv/bin/activate && pip install --no-cache-dir -r requirements.txt
+    # Install dependencies
+# RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the current directory contents into the container at /app
