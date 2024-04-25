@@ -4,10 +4,8 @@ services:
     container_name: video-auto-composition
     ports:
       - "5000:5000"
+    working_dir: /app
     volumes:
       - ./assets/:/app/assets/
       - ./app.py:/app/app.py
-    environment:
-      - FLASK_APP=app.py
-      - FLASK_ENV=development
-      - FLASK_DEBUG=1
+    command: python app.py
