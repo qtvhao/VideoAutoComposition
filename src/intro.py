@@ -12,9 +12,9 @@ def intro(template_folder, placed_texts):
     if not os.path.exists(texts_config_file):
         texts = {}
         texts["texts"] = []
-        texts["texts"].append({"text": "LET’S TALK", "position": [228.857, 99.2187], "timeline_cursor": 1.2})
-        texts["texts"].append({"text": "THIS MONDAY | 3:40 PM", "position": [30.4708, 245.381], "timeline_cursor": 3.2})
-        texts["texts"].append({"text": "@Kiến thức Sunday", "position": [127.416, 48.0723], "timeline_cursor": 4.2})
+        texts["texts"].append({"text": "@Kiến thức Sunday", "position": [125, 80], "timeline_cursor": 4.2, "height": 21, "text_color": "#ffffff"})
+        texts["texts"].append({"text": "LET’S TALK", "position": [228, 99], "timeline_cursor": 1.2, "height": 96, "text_color": "#ffffff"})
+        texts["texts"].append({"text": "THIS MONDAY | 3:40 PM", "position": [30, 245], "timeline_cursor": 3.2, "height": 21, "text_color": "#ffffff"})
         with open(texts_config_file, 'w') as outfile:
             json.dump(texts, outfile)
     else:
@@ -35,6 +35,8 @@ def intro(template_folder, placed_texts):
         text_content = text["text"]
         text_position = text["position"]
         timeline_cursor = text["timeline_cursor"]
+        height = text["height"]
+        text_color = text["text_color"]
         # 
         print("text_content", text_content)
         print("text_position", text_position)
@@ -48,9 +50,10 @@ def intro(template_folder, placed_texts):
         video = moviepy.VideoFileClip(output_file)
         #
         # Add text
-        txt_clip = moviepy.TextClip(text_content, fontsize=70, color='white', bg_color='black', font="DejaVu-Sans-Bold")
-        txt_clip = txt_clip.set_position(text_position)
-        txt_clip = txt_clip.set_duration(video.duration)
+        txt_clip = moviepy.TextClip(text_content, fontsize=height * 1.5, color=text_color, font="DejaVu-Sans-Bold")
+        txt_clip = txt_clip.set_position([text_position[0], text_position[1] + height])
+        video_duration_subtract_timeline_cursor = video.duration - timeline_cursor
+        txt_clip = txt_clip.set_duration(video_duration_subtract_timeline_cursor)
         print("duration", video.duration)
         txt_clip = txt_clip.set_start(timeline_cursor)
         video = moviepy.CompositeVideoClip([video, txt_clip])
@@ -59,4 +62,5 @@ def intro(template_folder, placed_texts):
         shutil.move(tmp_output_file, output_file)
 
         print("output_file", output_file)
+        break
 
