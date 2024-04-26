@@ -10,4 +10,4 @@ services:
       - ./src/:/app/src/
       - ./templates/:/app/templates/
       - ./app.py:/app/app.py
-    command: bash -c ". venv/bin/activate && python3 app.py"
+    command: bash -c ". venv/bin/activate && timeout 300 python3 app.py"
