@@ -15,21 +15,20 @@ def one_word_at_a_time(subtitle_dir, video_path):
     clips = [
         moviepy.VideoFileClip(video_path)
     ]
+    reduced_text = ""
     for line in parsed:
         print(line)
         part = line['part']
+        part_is_should_be_on_same_line = part.startswith('"') or part.startswith("'") or part.startswith("(") or part.startswith("[") or part.startswith("{") or part.startswith("<")
+        if part_is_should_be_on_same_line:
+            reduced_text += part
+            continue
+        part_is_should_be_on_new_line = part.endswith('"') or part.endswith("'") or part.endswith(")") or part.endswith("]") or part.endswith("}") or part.endswith(">")
+        if part_is_should_be_on_new_line:
+            part = reduced_text + " " + part
+            reduced_text = ""
         start = line['start'] / 1000
         end = line['end'] / 1000
-        # magick -list font
-        #     wrapped_txt,
-        #     font=font_path,
-        #     fontsize=params.font_size,
-        #     color=params.text_fore_color,
-        #     bg_color=params.text_background_color,
-        #     stroke_color=params.stroke_color,
-        #     stroke_width=params.stroke_width,
-        #     print_cmd=False,
-
         text_clip_params = {
             "txt": part,
             "fontsize": 70,
