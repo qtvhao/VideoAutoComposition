@@ -16,17 +16,30 @@ def one_word_at_a_time(subtitle_dir, video_path):
         moviepy.VideoFileClip(video_path)
     ]
     reduced_text = ""
+    marker_for_same_line = False
     for line in parsed:
         print(line)
         part = line['part']
-        part_is_should_be_on_same_line = part.startswith('"') or part.startswith("'") or part.startswith("(") or part.startswith("[") or part.startswith("{") or part.startswith("<")
-        if part_is_should_be_on_same_line:
+    # AttributeError: 'str' object has no attribute 'includes', so I will use 'in' instead, Example: 'a' in 'abc'
+        # part_is_should_be_on_same_line = part.includes('"') or part.includes("'") or part.includes("(") or part.includes("[") or part.includes("{") or part.includes("<")
+        part_is_should_be_on_same_line = '"' in part or "'" in part or "(" in part or "[" in part or "{" in part or "<" in part
+        if part_is_should_be_on_same_line and not marker_for_same_line:
+            print("Part is should be on same line")
             reduced_text += part
+            marker_for_same_line = True
             continue
-        part_is_should_be_on_new_line = part.endswith('"') or part.endswith("'") or part.endswith(")") or part.endswith("]") or part.endswith("}") or part.endswith(">")
+        part_is_should_be_on_new_line = '"' in part or "'" in part or ")" in part or "]" in part or "}" in part or ">" in part
+        # part_is_should_be_on_new_line = part.includes('"') or part.includes("'") or part.includes(")") or part.includes("]") or part.includes("}") or part.includes(">")
         if part_is_should_be_on_new_line:
+            print("Part is should be on new line")
+            marker_for_same_line = False
             part = reduced_text + " " + part
             reduced_text = ""
+        else:
+            if marker_for_same_line:
+                print("Part is should be on same line")
+                reduced_text = reduced_text + " " + part
+                continue
         start = line['start'] / 1000
         end = line['end'] / 1000
         text_clip_params = {
@@ -40,7 +53,7 @@ def one_word_at_a_time(subtitle_dir, video_path):
             "align": "center",
             "fps": 30,
             "stroke_color": "black",
-            "stroke_width": 2,
+            "stroke_width": 1,
         }
         clip_info = {k: text_clip_params[k] for k in ('txt', 'fontsize', 'font', 'color', 'stroke_width', 'stroke_color', 'size', 'kerning', 'method', 'align') if k in text_clip_params}
         image_of_styled_text = moviepy.TextClip(**clip_info)
