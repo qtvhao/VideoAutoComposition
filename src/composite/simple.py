@@ -80,18 +80,19 @@ def combine_videos(combined_video_path: str,
             video_duration += clip.duration
 
     video_clip = moviepy.concatenate_videoclips(clips)
+    video_clip = video_clip.set_audio(audio_clip)
     video_clip = video_clip.set_fps(30)
     print(f"writing")
     # https://github.com/harry0703/MoneyPrinterTurbo/issues/111#issuecomment-2032354030
     video_clip.write_videofile(filename=combined_video_path,
                                threads=threads,
-                               logger=None,
                                temp_audiofile_path=output_dir,
                                audio_codec="aac",
                                fps=30,
                                )
     video_clip.close()
     print(f"completed")
+
     return combined_video_path
 
 
