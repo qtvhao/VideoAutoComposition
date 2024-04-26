@@ -21,13 +21,36 @@ def one_word_at_a_time(subtitle_dir, video_path):
         start = line['start'] / 1000
         end = line['end'] / 1000
         # magick -list font
-        image_of_styled_text = moviepy.TextClip(part, fontsize=70, color='white', font="DejaVu-Sans-Bold")
-        image_of_styled_text = image_of_styled_text.set_position('center')
+        #     wrapped_txt,
+        #     font=font_path,
+        #     fontsize=params.font_size,
+        #     color=params.text_fore_color,
+        #     bg_color=params.text_background_color,
+        #     stroke_color=params.stroke_color,
+        #     stroke_width=params.stroke_width,
+        #     print_cmd=False,
+
+        text_clip_params = {
+            "txt": part,
+            "fontsize": 70,
+            "color": "white",
+            "font": "DejaVu-Sans-Bold",
+            "size": (1920, 1080),
+            "kerning": 5,
+            "method": "caption",
+            "align": "center",
+            "fps": 30,
+            "stroke_color": "black",
+            "stroke_width": 2,
+        }
+        clip_info = {k: text_clip_params[k] for k in ('txt', 'fontsize', 'font', 'color', 'stroke_width', 'stroke_color', 'size', 'kerning', 'method', 'align') if k in text_clip_params}
+        image_of_styled_text = moviepy.TextClip(**clip_info)
+        # image_of_styled_text = image_of_styled_text.set_position('center')
         image_of_styled_text = image_of_styled_text.set_start(start)
         image_of_styled_text = image_of_styled_text.set_end(end)
         image_of_styled_text = image_of_styled_text.set_duration(end-start)
-        print("Start: ", start)
-        print("End: ", end)
+        # print("Start: ", start)
+        # print("End: ", end)
         image_of_styled_text = image_of_styled_text.set_fps(30)
         clips.append(image_of_styled_text)
     # print(parsed)
