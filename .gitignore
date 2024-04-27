@@ -3,3 +3,4 @@ src/__pycache__/
 src/composite/__pycache__/
 src/captions/__pycache__/
 node_modules/
+tmp/

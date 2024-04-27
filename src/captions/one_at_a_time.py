@@ -12,8 +12,12 @@ def one_word_at_a_time(subtitle_dir, video_path, output_file):
     subtitle = subtitle_json.read()
     subtitle_json.close()
     parsed = json.loads(subtitle)
+    if isinstance(video_path, str):
+        video = moviepy.VideoFileClip(video_path)
+    else:
+        video = video_path
     clips = [
-        moviepy.VideoFileClip(video_path)
+        video
     ]
     reduced_text = ""
     marker_for_same_line = False

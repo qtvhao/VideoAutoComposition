@@ -56,4 +56,5 @@ services:
       - ./templates/:/app/templates/
       - ./app.py:/app/app.py
       - ./worker.js:/app/worker.js
+      - ./tmp/:/tmp/
     command: bash -c ". venv/bin/activate && node worker.js"

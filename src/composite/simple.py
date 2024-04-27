@@ -5,7 +5,7 @@ from typing import List
 output_folder = "/app/assets/outputs/"
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
-def combine_videos(combined_video_path: str,
+def combine_videos(combined_video_path: str|bool,
                    video_paths: List[str],
                    audio_file: str,
                 #    video_aspect: VideoAspect = VideoAspect.portrait,
@@ -23,7 +23,7 @@ def combine_videos(combined_video_path: str,
     req_dur = audio_duration / len(video_paths)
     req_dur = max_clip_duration
     print(f"each clip will be maximum {req_dur} seconds long")
-    output_dir = os.path.dirname(combined_video_path)
+    # output_dir = os.path.dirname(combined_video_path)
 
     # aspect = VideoAspect(video_aspect)
     video_width, video_height = 1920, 1080
@@ -87,9 +87,11 @@ def combine_videos(combined_video_path: str,
     video_clip = video_clip.set_fps(30)
     print(f"writing")
     # https://github.com/harry0703/MoneyPrinterTurbo/issues/111#issuecomment-2032354030
+    if not combined_video_path:
+        return video_clip
     video_clip.write_videofile(filename=combined_video_path,
                                threads=threads,
-                               temp_audiofile_path=output_dir,
+                            #    temp_audiofile_path=output_dir,
                                audio_codec=codec_name,
                                fps=30,
                                )
@@ -120,6 +122,6 @@ def simple_composite(image_dir, audio_dir, output_file):
 
     # final_clip = moviepy.concatenate_videoclips(clips)
     # final_clip = final_clip.set_audio(moviepy.AudioFileClip(audio_dir + audio_file))
-    print(combine_videos(output_file, [image_dir + image_file for image_file in images_files], audio_dir + audio_file))
+    return (combine_videos(output_file, [image_dir + image_file for image_file in images_files], audio_dir + audio_file))
     # final_clip.write_videofile(output_file, codec="libx264", audio_codec="aac")
-    print("Done")
+    # print("Done")
