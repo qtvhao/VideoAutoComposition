@@ -5,6 +5,9 @@ services:
     ports:
       - "5672:5672" # AMQP
       - "15672:15672" # Web UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
     healthcheck:
       test: ["CMD", "rabbitmqctl", "status"]
       interval: 5s
@@ -27,7 +30,7 @@ services:
     stop_grace_period: 1s
     depends_on:
       add-test-job:
-        condition: service_completed_successfully
+        condition: service_started
     build: .
     container_name: video-auto-composition
     ports:
@@ -38,6 +41,7 @@ services:
       - ./src/:/app/src/
       - ./templates/:/app/templates/
       - ./app.py:/app/app.py
+      - ./tasks.py:/app/tasks.py
       - ./queues.py:/app/queues.py
       - ./test.py:/app/test.py
-    command: bash -c ". venv/bin/activate && celery -A app worker --loglevel=INFO"
+    command: bash -c ". venv/bin/activate && celery -A tasks worker --loglevel=INFO"
