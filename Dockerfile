@@ -25,6 +25,8 @@ RUN . venv/bin/activate && apt-get update && apt-get install -y \
 # 
 COPY requirements.txt ./
 RUN python -m venv venv && . venv/bin/activate && pip install --no-cache-dir -r requirements.txt
+# celery
+# RUN . venv/bin/activate && pip install --no-cache-dir celery
 RUN cat /etc/ImageMagick-6/policy.xml | sed 's/none/read,write/g'> /etc/ImageMagick-6/policy.xml
 
 # Add font Courier, Arial

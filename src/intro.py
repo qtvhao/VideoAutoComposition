@@ -2,27 +2,7 @@ import os
 import json
 import shutil
 import moviepy.editor as moviepy
-from bullmq import Worker
-import asyncio
 import random
-async def process(job, job_token):
-    # job.data will include the data added to the queue
-    print("Processing job", job.id, job.data)
-    return job.data
-
-async def intro_worker():
-    # Feel free to remove the connection parameter, if your redis runs on localhost
-    print("Worker is starting")
-    worker = Worker("video-auto-composition", process, {"connection": "redis://redis:6379/0"})
-
-    print("Worker is running")
-    # This while loop is just for the sake of this example
-    # you won't need it in practice.
-    while True: # Add some breaking conditions here
-        await asyncio.sleep(1)
-
-    # When no need to process more jobs we should close the worker
-    # await worker.close()
 
 def intro(template_folder, placed_texts):
     mp4_file = [f for f in os.listdir(template_folder) if f.endswith('.mp4')][0]

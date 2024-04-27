@@ -1,7 +1,4 @@
-let Queue = require('bull');
-
-
-let queue = new Queue('video-auto-composition', 'redis://redis:6379');
+let amqp = require('amqplib');
 
 let jobData = {
     videoId: '1',
@@ -9,13 +6,14 @@ let jobData = {
     videoTitle: 'Video Title',
 };
 
-queue.add(jobData, {
-    attempts: 3,
-    backoff: {
-        type: 'exponential',
-        delay: 1000
-    }
-}).then((job) => {
-    console.log('Job added', job.id);
-    process.exit();
+let jobDataBuffer = Buffer.from(JSON.stringify(jobData));
+
+amqp.connect('amqp://amqp').then(async (connection) => {
+    let channel = await connection.createChannel();
+    await channel.assertQueue('video-auto-composition-jobs', {durable: true});
+    channel.sendToQueue('video-auto-composition-jobs', jobDataBuffer, {persistent: true});
+    console.log('Job sent');
+    setTimeout(() => {
+        connection.close();
+    }, 500);
 });

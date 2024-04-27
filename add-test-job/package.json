@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/qtvhao/VideoAutoComposition#readme",
   "dependencies": {
-    "bull": "^4.12.2"
+    "amqplib": "^0.10.4"
   }
 }
