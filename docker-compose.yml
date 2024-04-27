@@ -40,6 +40,4 @@ services:
       - ./app.py:/app/app.py
       - ./queues.py:/app/queues.py
       - ./test.py:/app/test.py
-    # command: bash -c "set -xe ; . venv/bin/activate && python3 app.py"
-    # command: celery -A tasks worker --loglevel=INFO
-    command: bash -c ". venv/bin/activate && python test.py && celery -A app worker --loglevel=INFO"
+    command: bash -c ". venv/bin/activate && celery -A app worker --loglevel=INFO"

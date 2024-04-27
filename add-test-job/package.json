@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/qtvhao/VideoAutoComposition#readme",
   "dependencies": {
-    "amqplib": "^0.10.4"
+    "celery-node": "^0.5.9"
   }
 }

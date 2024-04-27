@@ -1,4 +1,4 @@
-let amqp = require('amqplib');
+const celery = require('celery-node');
 
 let jobData = {
     videoId: '1',
@@ -6,14 +6,14 @@ let jobData = {
     videoTitle: 'Video Title',
 };
 
-let jobDataBuffer = Buffer.from(JSON.stringify(jobData));
+const client = celery.createClient(
+  "amqp://",
+  "amqp://"
+);
 
-amqp.connect('amqp://amqp').then(async (connection) => {
-    let channel = await connection.createChannel();
-    await channel.assertQueue('video-auto-composition-jobs', {durable: true});
-    channel.sendToQueue('video-auto-composition-jobs', jobDataBuffer, {persistent: true});
-    console.log('Job sent');
-    setTimeout(() => {
-        connection.close();
-    }, 500);
+const task = client.createTask("tasks.add");
+const result = task.applyAsync([1, 2]);
+result.get().then(data => {
+  console.log(data);
+  client.disconnect();
 });
