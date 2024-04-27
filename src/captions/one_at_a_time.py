@@ -73,7 +73,7 @@ def one_word_at_a_time(subtitle_dir, video_path, output_file):
     video_clip = moviepy.CompositeVideoClip(clips)
     video_clip = video_clip.set_fps(30)
     # output_file = output_folder + "output-one-word-at-a-time.mp4"
-    video_clip.write_videofile(filename=output_file, codec="libx264", audio_codec="aac")
+    video_clip.write_videofile(filename=output_file)
     video_clip.close()
     print("done")
 
