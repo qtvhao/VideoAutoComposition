@@ -15,7 +15,8 @@ let queue = new Queue(queueName, {
 queue.process(async (job) => {
     console.log('Processing job', job.id);
     console.log('Job data', job.data);
-    fs.writeFileSync('/tmp/job.json', JSON.stringify(job.data));
+    let jobJson = '/tmp/job-' + job.id + '.json'
+    fs.writeFileSync(jobJson, JSON.stringify(job.data));
     let compositeEngine = job.data.compositeEngine;
     if (compositeEngine) {
         console.log('Composite engine', compositeEngine);
@@ -27,9 +28,8 @@ queue.process(async (job) => {
     let script = 'app.py'
     let stdout = '';
     let stderr = '';
-    let outputFile = `/tmp/composite-${compositeEngine}-${job.id}.mp4`;
     await new Promise((resolve, reject) => {
-        let process = spawn('python3', [script, 'composite', compositeEngine, outputFile]);
+        let process = spawn('python3', [script, 'composite', jobJson]);
         process.stdout.on('data', (data) => {
             stdout += data.toString();
             console.log(data)
@@ -59,7 +59,7 @@ queue.process(async (job) => {
 queue.add({
     compositeEngine: 'simple',
     "numberthOfParagraph": 0,
-    "articleId": "",
+    "articleId": "article_id",
     "videoScript": [
       {
         "jobId": "",
@@ -68,7 +68,7 @@ queue.add({
         "keyword": "career opportunities",
         "translated": "",
         "transitionImageFile": "",
-        "audioFilePath": "/app/audio/file-26054585169.mp3",
+        "audioFilePath": "/app/audio/audio.mp3",
         "subtitle": [
           {
             "part": "Tóm ",

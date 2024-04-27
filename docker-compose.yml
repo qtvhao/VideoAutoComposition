@@ -51,9 +51,11 @@ services:
       - "5000:5000"
     working_dir: /app
     volumes:
-      - ./assets/:/app/assets/
+      - ./assets/image/:/app/storage/images/0/
+      - ./assets/audio/:/app/audio/
+      - ./assets/outputs/:/app/storage/sequences/
       - ./src/:/app/src/
-      - ./templates/:/app/templates/
+      # - ./templates/:/app/templates/
       - ./app.py:/app/app.py
       - ./worker.js:/app/worker.js
       - ./tmp/:/tmp/

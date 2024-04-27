@@ -101,12 +101,12 @@ def combine_videos(combined_video_path: str|bool,
     return combined_video_path
 
 
-def simple_composite(image_dir, audio_dir, output_file):
+def simple_composite(image_dir, audio_file, output_file):
     images_files = [f for f in os.listdir(image_dir) if f.endswith('.mp4')]
     print(images_files)
 
-    audio_file = [f for f in os.listdir(audio_dir) if f.endswith('.mp3')][0]
-    print(audio_file)
+    # audio_file = [f for f in os.listdir(audio_dir) if f.endswith('.mp3')][0]
+    # print(audio_file)
     
     # audio_duration = moviepy.AudioFileClip(audio_dir + "/" + audio_file).duration
 
@@ -122,6 +122,6 @@ def simple_composite(image_dir, audio_dir, output_file):
 
     # final_clip = moviepy.concatenate_videoclips(clips)
     # final_clip = final_clip.set_audio(moviepy.AudioFileClip(audio_dir + audio_file))
-    return (combine_videos(output_file, [image_dir + image_file for image_file in images_files], audio_dir + audio_file))
+    return (combine_videos(output_file, [image_dir + image_file for image_file in images_files], audio_file))
     # final_clip.write_videofile(output_file, codec="libx264", audio_codec="aac")
     # print("Done")

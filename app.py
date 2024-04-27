@@ -20,16 +20,26 @@ if __name__ == "__main__":
     # simple()
     argv = sys.argv
     route = argv[1]
-    engine = argv[2]
-    output_file = argv[3]
+    job_json_file = argv[2]
+    job_json = open(job_json_file, "r").read()
+    job = json.loads(job_json)
+    numberthOfParagraph = job["numberthOfParagraph"]
+    paragraph = job["videoScript"][numberthOfParagraph]
+    subtitle = paragraph["subtitle"]
+    audio_file = paragraph["audioFilePath"]
+    engine = "simple"
+    print(f"job: {job}")
+    article_id = "" + job["articleId"]
+    output_file = "/tmp/composite-" + engine + "-" + article_id + ".mp4"
     print(f"route: {route}")
     print(f"engine: {engine}")
     print(f"output_file: {output_file}")
+    print(f"audio_file: {audio_file}")
     if route == "composite":
         if engine == "simple":
             randomId = random.randbytes(8).hex()
-            compost = simple.simple_composite(ASSETS_DIR + "image/", ASSETS_DIR + "audio/", False)
-            one_at_a_time.one_word_at_a_time(ASSETS_DIR + "audio/", compost, output_file)
+            compost = simple.simple_composite("/app/storage/images/0/", audio_file, False)
+            one_at_a_time.one_word_at_a_time(subtitle, compost, output_file)
 
             returnvalue({
                 "composite": "/tmp/composite-" + randomId + ".mp4",
