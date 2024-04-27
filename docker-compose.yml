@@ -20,24 +20,31 @@ services:
     environment:
       - REDIS_HOST=redis
     stop_grace_period: 1s
+    healthcheck:
+      test: ["CMD", "ping", "-c", "1", "localhost"]
+      interval: 2s
+      timeout: 20s
+      retries: 20
   # 
-  add-test-job:
-    build:
-      context: ./add-test-job/
-      dockerfile: Dockerfile
-    volumes:
-      - ./add-test-job/:/app/
-    container_name: add-test-job
-    working_dir: /app
-    command: bash -c "node ./main.js"
-    depends_on:
-      redis:
-        condition: service_healthy
+  # add-test-job:
+  #   build:
+  #     context: ./add-test-job/
+  #     dockerfile: Dockerfile
+  #   volumes:
+  #     - ./add-test-job/:/app/
+  #   container_name: add-test-job
+  #   working_dir: /app
+  #   command: bash -c "node ./main.js"
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
   video-auto-composition:
     stop_grace_period: 1s
     depends_on:
-      add-test-job:
-        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      bullboard:
+        condition: service_healthy
     build: .
     container_name: video-auto-composition
     ports:
@@ -48,6 +55,5 @@ services:
       - ./src/:/app/src/
       - ./templates/:/app/templates/
       - ./app.py:/app/app.py
-      - ./queues.py:/app/queues.py
       - ./worker.js:/app/worker.js
     command: bash -c ". venv/bin/activate && node worker.js"
