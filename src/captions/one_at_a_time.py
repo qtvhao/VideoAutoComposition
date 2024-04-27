@@ -6,12 +6,6 @@ import json
 
 def one_word_at_a_time(subtitle, video_path, output_file):
     # 
-    # subtitle_json = subtitle_dir + [file for file in os.listdir(subtitle_dir) if file.endswith('.json')][0]
-    # print(subtitle_json)
-    # subtitle_json = open(subtitle_json, 'r')
-    # subtitle = subtitle_json.read()
-    # subtitle_json.close()
-    # parsed = json.loads(subtitle)
     if isinstance(video_path, str):
         video = moviepy.VideoFileClip(video_path)
     else:
@@ -22,7 +16,6 @@ def one_word_at_a_time(subtitle, video_path, output_file):
     reduced_text = ""
     marker_for_same_line = False
     marker_start = 0
-    # marker_end = 0
     for line in subtitle:
         print(line)
         part = line['part']

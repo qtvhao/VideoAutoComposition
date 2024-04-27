@@ -51,3 +51,6 @@ RUN apt-get update && apt-get install -y \
     fonts-wqy-zenhei \
     fonts-wqy-microhei \
     && rm -rf /var/lib/apt/lists/*
+
+COPY *.py *.js *.json ./
+COPY src src
