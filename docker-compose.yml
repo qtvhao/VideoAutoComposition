@@ -5,6 +5,11 @@ services:
     container_name: redis
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1s
+      timeout: 1s
+      retries: 3
   bullboard:
     stop_grace_period: 1s
     container_name: bullboard
@@ -25,6 +30,9 @@ services:
     container_name: add-test-job
     working_dir: /app
     command: bash -c "node ./main.js"
+    depends_on:
+      redis:
+        condition: service_healthy
   video-auto-composition:
     stop_grace_period: 1s
     depends_on:
