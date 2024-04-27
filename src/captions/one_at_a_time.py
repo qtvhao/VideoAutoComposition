@@ -2,9 +2,9 @@ import moviepy.editor as moviepy
 import os
 import json
 
-output_folder = "/app/assets/outputs/"
+# output_folder = "/app/assets/outputs/"
 
-def one_word_at_a_time(subtitle_dir, video_path):
+def one_word_at_a_time(subtitle_dir, video_path, output_file):
     # 
     subtitle_json = subtitle_dir + [file for file in os.listdir(subtitle_dir) if file.endswith('.json')][0]
     print(subtitle_json)
@@ -68,7 +68,10 @@ def one_word_at_a_time(subtitle_dir, video_path):
         clips.append(image_of_styled_text)
     video_clip = moviepy.CompositeVideoClip(clips)
     video_clip = video_clip.set_fps(30)
-    video_clip.write_videofile(filename=output_folder + "output-one-word-at-a-time.mp4", codec="libx264", audio_codec="aac")
+    # output_file = output_folder + "output-one-word-at-a-time.mp4"
+    video_clip.write_videofile(filename=output_file, codec="libx264", audio_codec="aac")
     video_clip.close()
     print("done")
+
+    return output_file
     

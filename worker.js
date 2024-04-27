@@ -13,9 +13,6 @@ queue.add({
         images: fs.readdirSync(assetsImageDir).map(file => path.join(assetsImageDir, file)),
     }
 });
-setTimeout(r => {
-    process.exit();
-}, 10_000);
 queue.process(async (job) => {
     console.log('Processing job', job.id);
     console.log('Job data', job.data);
@@ -29,26 +26,33 @@ queue.process(async (job) => {
     }
     // 
     let script = 'app.py'
+    let stdout = '';
+    let stderr = '';
+    let outputFile = `/tmp/composite-${compositeEngine}-${job.id}.mp4`;
     await new Promise((resolve, reject) => {
-        let process = spawn('python3', [script, 'composite', compositeEngine]);
+        let process = spawn('python3', [script, 'composite', compositeEngine, outputFile]);
         process.stdout.on('data', (data) => {
-            console.log(`stdout: ${data}`);
+            stdout += data.toString();
+            console.log(data)
         });
         process.stderr.on('data', (data) => {
+            stderr += data.toString();
             console.error(`stderr: ${data}`);
         });
         process.on('close', (code) => {
             if (code !== 0) {
                 console.error(`child process exited with code ${code}`);
-                reject();
+                reject(stderr);
             }
             console.log(`child process exited with code ${code}`);
-            resolve();
+            resolve(stdout);
         });
     });
     //
     let returnValue = JSON.parse(fs.readFileSync('/tmp/returnvalue.json'));
     console.log('Return value', returnValue);
+    console.log('Stdout', stdout);
+    console.log('Stderr', stderr);
 
     return returnValue;
 });

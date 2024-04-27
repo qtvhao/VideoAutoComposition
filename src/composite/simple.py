@@ -14,6 +14,9 @@ def combine_videos(combined_video_path: str,
                    threads: int = 2,
                    ) -> str:
     audio_clip = moviepy.AudioFileClip(audio_file)
+    codec_name = "aac"
+    if audio_file.endswith(".mp3"):
+        codec_name = "libmp3lame"
     audio_duration = audio_clip.duration
     print(f"max duration of audio: {audio_duration} seconds")
     # Required duration of each clip
@@ -87,7 +90,7 @@ def combine_videos(combined_video_path: str,
     video_clip.write_videofile(filename=combined_video_path,
                                threads=threads,
                                temp_audiofile_path=output_dir,
-                               audio_codec="aac",
+                               audio_codec=codec_name,
                                fps=30,
                                )
     video_clip.close()
@@ -96,19 +99,16 @@ def combine_videos(combined_video_path: str,
     return combined_video_path
 
 
-def simple_composite(image_dir, audio_dir):
-    output_file = output_folder + "output-concat.mp4"
-    if os.path.exists(output_file):
-        return output_file
+def simple_composite(image_dir, audio_dir, output_file):
     images_files = [f for f in os.listdir(image_dir) if f.endswith('.mp4')]
     print(images_files)
 
     audio_file = [f for f in os.listdir(audio_dir) if f.endswith('.mp3')][0]
     print(audio_file)
     
-    audio_duration = moviepy.AudioFileClip(audio_dir + audio_file).duration
+    # audio_duration = moviepy.AudioFileClip(audio_dir + "/" + audio_file).duration
 
-    print("Duration", audio_duration)
+    # print("Duration", audio_duration)
     # clips = []
     # final_duration = 0
     # for image_file in images_files:
@@ -120,6 +120,6 @@ def simple_composite(image_dir, audio_dir):
 
     # final_clip = moviepy.concatenate_videoclips(clips)
     # final_clip = final_clip.set_audio(moviepy.AudioFileClip(audio_dir + audio_file))
-    print(combine_videos(output_file, [image_dir + image_file for image_file in images_files], audio_dir + audio_file))
+    print(combine_videos(output_file, [image_dir + "/" + image_file for image_file in images_files], audio_dir + "/" + audio_file))
     # final_clip.write_videofile(output_file, codec="libx264", audio_codec="aac")
     print("Done")
