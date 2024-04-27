@@ -2,7 +2,11 @@
   "name": "videoautocomposition",
   "version": "1.0.0",
   "description": "",
-  "main": "add-test-job.js",
+  "main": "worker.js",
+  "dependencies": {
+    "bull": "^4.12.2"
+  },
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,8 +19,5 @@
   "bugs": {
     "url": "https://github.com/qtvhao/VideoAutoComposition/issues"
   },
-  "homepage": "https://github.com/qtvhao/VideoAutoComposition#readme",
-  "dependencies": {
-    "bull": "^4.12.2"
-  }
+  "homepage": "https://github.com/qtvhao/VideoAutoComposition#readme"
 }

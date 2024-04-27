@@ -1,15 +1,20 @@
-const celery = require('celery-node');
+let Queue = require('bull');
 
-const client = celery.createClient("amqp://amqp", "amqp://amqp");
-// client.conf.TASK_PROTOCOL = 1;
+let queue = new Queue('video-auto-composition', 'redis://redis:6379');
 
-const task = client.createTask("tasks.add");
-const result = task.applyAsync([1, 2]);
-result.get().then(data => {
-  console.log(data);
-  client.disconnect();
+let jobData = {
+    videoId: '1',
+    videoUrl: 'https://www.youtube.com/watch?v=1',
+    videoTitle: 'Video Title',
+};
+
+queue.add(jobData, {
+    attempts: 3,
+    backoff: {
+        type: 'exponential',
+        delay: 1000
+    }
+}).then((job) => {
+    console.log('Job added', job.id);
+    process.exit();
 });
-
-// const worker = celery.createWorker("amqp://amqp", "amqp://amqp");
-// worker.register("tasks.add", (a, b) => a + b);
-// worker.start();
