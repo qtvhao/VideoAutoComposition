@@ -451,7 +451,7 @@ queue.add({
             "end": 18825
           }
         ],
-        "sanitizedBaseDirectory": "/app/storage/images/base",
+        "sanitizedBaseDirectory": "/app/storage/images/0/",
         "sanitizedImages": [
           "0-68-10054691683-68-2021-05-20-at-112325-AM.mp4"
         ]

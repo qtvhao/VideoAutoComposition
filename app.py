@@ -26,6 +26,7 @@ if __name__ == "__main__":
     numberthOfParagraph = job["numberthOfParagraph"]
     paragraph = job["videoScript"][numberthOfParagraph]
     subtitle = paragraph["subtitle"]
+    sanitizedBaseDirectory = paragraph["sanitizedBaseDirectory"]
     audio_file = paragraph["audioFilePath"]
     engine = "simple"
     print(f"job: {job}")
@@ -38,7 +39,7 @@ if __name__ == "__main__":
     if route == "composite":
         if engine == "simple":
             randomId = random.randbytes(8).hex()
-            compost = simple.simple_composite("/app/storage/images/0/", audio_file, False)
+            compost = simple.simple_composite(sanitizedBaseDirectory, audio_file, False)
             one_at_a_time.one_word_at_a_time(subtitle, compost, output_file)
 
             returnvalue({
