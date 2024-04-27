@@ -27,9 +27,9 @@ if __name__ == "__main__":
     print(f"output_file: {output_file}")
     if route == "composite":
         if engine == "simple":
-            randomId = random.randbytes(8).hex
-            simple.simple_composite(ASSETS_DIR + "image", ASSETS_DIR + "audio", "/tmp/composite-" + randomId + ".mp4")
-            one_at_a_time.one_word_at_a_time(ASSETS_DIR + "audio", "/tmp/composite-" + randomId + ".mp4", output_file)
+            randomId = random.randbytes(8).hex()
+            simple.simple_composite(ASSETS_DIR + "image/", ASSETS_DIR + "audio/", "/tmp/composite-" + randomId + ".mp4")
+            one_at_a_time.one_word_at_a_time(ASSETS_DIR + "audio/", "/tmp/composite-" + randomId + ".mp4", output_file)
 
             returnvalue({
                 "composite": "/tmp/composite-" + randomId + ".mp4",

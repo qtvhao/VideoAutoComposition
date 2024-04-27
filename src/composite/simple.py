@@ -120,6 +120,6 @@ def simple_composite(image_dir, audio_dir, output_file):
 
     # final_clip = moviepy.concatenate_videoclips(clips)
     # final_clip = final_clip.set_audio(moviepy.AudioFileClip(audio_dir + audio_file))
-    print(combine_videos(output_file, [image_dir + "/" + image_file for image_file in images_files], audio_dir + "/" + audio_file))
+    print(combine_videos(output_file, [image_dir + image_file for image_file in images_files], audio_dir + audio_file))
     # final_clip.write_videofile(output_file, codec="libx264", audio_codec="aac")
     print("Done")
