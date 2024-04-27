@@ -48,12 +48,12 @@ def one_word_at_a_time(subtitle_dir, video_path):
         text_clip_params = {
             "txt": part,
             "fontsize": 70,
-            "color": "white",
+            "color": "#fffa00",
             "font": "DejaVu-Sans-Bold",
             "size": (1920, 1080),
             "kerning": 5,
             "method": "caption",
-            "align": "center",
+            # "align": "center",
             "fps": 30,
             "stroke_color": "black",
             "stroke_width": 1,
@@ -64,6 +64,7 @@ def one_word_at_a_time(subtitle_dir, video_path):
         image_of_styled_text = image_of_styled_text.set_end(end)
         image_of_styled_text = image_of_styled_text.set_duration(end-start)
         image_of_styled_text = image_of_styled_text.set_fps(30)
+        image_of_styled_text = image_of_styled_text.set_position("center", "bottom")
         clips.append(image_of_styled_text)
     video_clip = moviepy.CompositeVideoClip(clips)
     video_clip = video_clip.set_fps(30)

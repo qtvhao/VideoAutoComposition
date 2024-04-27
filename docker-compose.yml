@@ -1,5 +1,34 @@
 services:
+  redis:
+    stop_grace_period: 1s
+    image: "redis:alpine"
+    container_name: redis
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+  bullboard:
+    stop_grace_period: 1s
+    container_name: bullboard
+    image: ghcr.io/qtvhao/bull-board-docker:master
+    restart: always
+    ports:
+      - 3000:3000
+    environment:
+      - REDIS_HOST=redis
+    stop_grace_period: 1s
+  add-test-job:
+    build:
+      context: ./add-test-job/
+      dockerfile: Dockerfile
+    volumes:
+      - ./add-test-job/:/app/
+    container_name: add-test-job
+    working_dir: /app
+    command: bash -c "node ./main.js"
   video-auto-composition:
+    stop_grace_period: 1s
+    depends_on:
+      add-test-job:
+        condition: service_completed_successfully
     build: .
     container_name: video-auto-composition
     ports:
@@ -10,4 +39,5 @@ services:
       - ./src/:/app/src/
       - ./templates/:/app/templates/
       - ./app.py:/app/app.py
-    command: bash -c ". venv/bin/activate && timeout 300 python3 app.py"
+      - ./queues.py:/app/queues.py
+    command: bash -c "set -xe ; . venv/bin/activate && python3 app.py"

@@ -1,0 +1,22 @@
+{
+  "name": "videoautocomposition",
+  "version": "1.0.0",
+  "description": "",
+  "main": "add-test-job.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qtvhao/VideoAutoComposition.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/qtvhao/VideoAutoComposition/issues"
+  },
+  "homepage": "https://github.com/qtvhao/VideoAutoComposition#readme",
+  "dependencies": {
+    "bull": "^4.12.2"
+  }
+}
