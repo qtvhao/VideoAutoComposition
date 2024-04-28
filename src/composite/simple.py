@@ -2,6 +2,7 @@ import moviepy.editor as moviepy
 import os
 from typing import List
 
+logs_file = "/tmp/logs.txt"
 output_folder = "/app/assets/outputs/"
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
@@ -83,6 +84,10 @@ def combine_videos(combined_video_path: str|bool,
             clips.append(clip)
             video_duration += clip.duration
 
+    logs = open(logs_file, "w")
+    for clip in clips:
+        logs.write(f"Clip type: {type(clip)}, duration: {clip.duration}, size: {clip.size}, path: {clip.filename}\n")
+    logs.close()
     video_clip = moviepy.concatenate_videoclips(clips)
     video_clip = video_clip.set_audio(audio_clip)
     video_clip = video_clip.set_fps(30)

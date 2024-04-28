@@ -10,6 +10,7 @@ ASSETS_DIR = "/app/assets/"
 SRC_DIR = "/app/src/"
 TEMPLATES_DIR = "/app/templates/"
 
+logs_file = "/tmp/logs.txt"
 # template="Minimalist Line-based Economic News Intro"
 # template_folder = TEMPLATES_DIR + template + "/"
 def returnvalue(returnvalue_0):
@@ -48,7 +49,10 @@ if __name__ == "__main__":
             compost = simple.simple_composite(sanitizedBaseDirectory, audio_file, False)
             one_at_a_time.one_word_at_a_time(subtitle, compost, output_file)
 
+            logs = open(logs_file, "r").read()
+
             returnvalue({
+                "logs": logs,
                 "composite": "/tmp/composite-" + randomId + ".mp4",
                 "caption": output_file
             })
