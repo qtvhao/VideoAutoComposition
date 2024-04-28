@@ -1,18 +1,31 @@
 let Queue = require('bull');
 let fs = require('fs');
 let { spawn } = require('child_process');
-const path = require('path');
+// const path = require('path');
 
 // let assetsImageDir = path.join(__dirname, 'assets', 'image');
 let queueName = process.env.QUEUE_NAME || 'video-auto-composition';
-let queue = new Queue(queueName, {
+let destinateQueueName = process.env.DESTINATE_QUEUE || 'video-auto-composition-result';
+let opts = {
   redis: {
     host: process.env.REDIS_HOST || 'redis',
     port: 6379,
     password: process.env.REDIS_PASSWORD || undefined,
   }
-});
+};
+let queue = new Queue(queueName, opts);
+let destinateQueue = new Queue(destinateQueueName, opts);
+
 queue.process(async (job) => {
+  (async function() {
+    let jobIds = job.data.videoScript.map((videoScript) => videoScript.jobId);
+    console.log('Job ids', jobIds);
+    // await destinateQueue.add(returnValue);
+  })();
+
+  return {
+    returnValue: 'OK'
+  }
   console.log('Processing job', job.id);
   console.log('Job data', job.data);
   let jobJson = '/tmp/job-' + job.id + '.json'
@@ -57,13 +70,13 @@ queue.process(async (job) => {
 });
 
 if (process.env.DEBUG) {
-  queue.add({
+  let jobData = ({
     compositeEngine: 'simple',
     "numberthOfParagraph": 0,
     "articleId": "article_id",
     "videoScript": [
       {
-        "jobId": "",
+        "jobId": "job-1",
         "keywords": [],
         "image_stock_search_phrases": [],
         "keyword": "career opportunities",
@@ -205,251 +218,6 @@ if (process.env.DEBUG) {
             "part": "quả. ",
             "start": 6150,
             "end": 6562
-          },
-          {
-            "part": "Bằng ",
-            "start": 6925,
-            "end": 7150
-          },
-          {
-            "part": "cách ",
-            "start": 7162,
-            "end": 7325
-          },
-          {
-            "part": "sử ",
-            "start": 7337,
-            "end": 7512
-          },
-          {
-            "part": "dụng ",
-            "start": 7525,
-            "end": 7737
-          },
-          {
-            "part": "nhiều \"",
-            "start": 7750,
-            "end": 7987
-          },
-          {
-            "part": "phương ",
-            "start": 8000,
-            "end": 8237
-          },
-          {
-            "part": "pháp ",
-            "start": 8250,
-            "end": 8450
-          },
-          {
-            "part": "tính ",
-            "start": 8462,
-            "end": 8662
-          },
-          {
-            "part": "chi ",
-            "start": 8675,
-            "end": 8850
-          },
-          {
-            "part": "phí\"   ",
-            "start": 8862,
-            "end": 9187
-          },
-          {
-            "part": "và ",
-            "start": 9200,
-            "end": 9587
-          },
-          {
-            "part": "phân ",
-            "start": 9600,
-            "end": 9812
-          },
-          {
-            "part": "tích \"",
-            "start": 9825,
-            "end": 10012
-          },
-          {
-            "part": "hành ",
-            "start": 10025,
-            "end": 10262
-          },
-          {
-            "part": "vi ",
-            "start": 10275,
-            "end": 10425
-          },
-          {
-            "part": "chi ",
-            "start": 10437,
-            "end": 10637
-          },
-          {
-            "part": "phí\"  , ",
-            "start": 10650,
-            "end": 11062
-          },
-          {
-            "part": "doanh ",
-            "start": 11387,
-            "end": 11600
-          },
-          {
-            "part": "nghiệp ",
-            "start": 11612,
-            "end": 11812
-          },
-          {
-            "part": "có ",
-            "start": 11825,
-            "end": 11950
-          },
-          {
-            "part": "thể ",
-            "start": 11962,
-            "end": 12150
-          },
-          {
-            "part": "đưa ",
-            "start": 12162,
-            "end": 12337
-          },
-          {
-            "part": "ra ",
-            "start": 12350,
-            "end": 12512
-          },
-          {
-            "part": "quyết ",
-            "start": 12525,
-            "end": 12712
-          },
-          {
-            "part": "định ",
-            "start": 12725,
-            "end": 12900
-          },
-          {
-            "part": "sáng ",
-            "start": 12912,
-            "end": 13137
-          },
-          {
-            "part": "suốt, ",
-            "start": 13150,
-            "end": 13462
-          },
-          {
-            "part": "nâng ",
-            "start": 13787,
-            "end": 14000
-          },
-          {
-            "part": "cao \"",
-            "start": 14012,
-            "end": 14225
-          },
-          {
-            "part": "khả ",
-            "start": 14237,
-            "end": 14437
-          },
-          {
-            "part": "năng ",
-            "start": 14450,
-            "end": 14650
-          },
-          {
-            "part": "sinh ",
-            "start": 14662,
-            "end": 14862
-          },
-          {
-            "part": "lời\"   ",
-            "start": 14875,
-            "end": 15150
-          },
-          {
-            "part": "và ",
-            "start": 15162,
-            "end": 15537
-          },
-          {
-            "part": "đạt ",
-            "start": 15550,
-            "end": 15737
-          },
-          {
-            "part": "được \"",
-            "start": 15750,
-            "end": 15937
-          },
-          {
-            "part": "lợi ",
-            "start": 15950,
-            "end": 16125
-          },
-          {
-            "part": "thế ",
-            "start": 16137,
-            "end": 16325
-          },
-          {
-            "part": "cạnh ",
-            "start": 16337,
-            "end": 16562
-          },
-          {
-            "part": "tranh\"   ",
-            "start": 16575,
-            "end": 16875
-          },
-          {
-            "part": "trong ",
-            "start": 16887,
-            "end": 17137
-          },
-          {
-            "part": "thời ",
-            "start": 17150,
-            "end": 17312
-          },
-          {
-            "part": "đại ",
-            "start": 17325,
-            "end": 17475
-          },
-          {
-            "part": "ngày ",
-            "start": 17487,
-            "end": 17675
-          },
-          {
-            "part": "nay ",
-            "start": 17687,
-            "end": 17912
-          },
-          {
-            "part": "thị ",
-            "start": 17925,
-            "end": 18112
-          },
-          {
-            "part": "trường ",
-            "start": 18125,
-            "end": 18350
-          },
-          {
-            "part": "năng ",
-            "start": 18362,
-            "end": 18550
-          },
-          {
-            "part": "động.",
-            "start": 18562,
-            "end": 18825
           }
         ],
         "sanitizedBaseDirectory": "/app/storage/images/0/",
@@ -471,5 +239,14 @@ if (process.env.DEBUG) {
       ]
     },
     "queueName": ""
+  });
+  let jobs = [];
+  jobData.videoScript[1] = JSON.parse(JSON.stringify(jobData.videoScript[0]))
+  jobData.videoScript[1].jobId = 'job-2';
+  jobs.push(JSON.parse(JSON.stringify(jobData)));
+  jobData.numberthOfParagraph = 1;
+  jobs.push(JSON.parse(JSON.stringify(jobData)));
+  jobs.map((job) => {
+    queue.add(job);
   });
 }
