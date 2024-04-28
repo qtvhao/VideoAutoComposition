@@ -18,7 +18,7 @@ let destinateQueue = new Queue(destinateQueueName, opts);
 
 async function mergeToQueue(job) {
   let jobIds = job.data.videoScript.map((videoScript) => videoScript.jobId);
-  console.log('Job ids', jobIds);
+  // console.log('Job ids', jobIds);
   for (let i = 0; i < 10; i++) {
     await new Promise(r => setTimeout(r, 1000));
     let jobs = await Promise.all(jobIds.map((jobId) => queue.getJob(jobId)));
@@ -41,20 +41,26 @@ async function mergeToQueue(job) {
         }
       };
       if (!await destinateQueue.getJob(destinateJob.opts.jobId)) {
-        console.log('Adding destinate job', destinateJob.data);
-        await destinateQueue.add(destinateJob);
+        console.log('Adding destinate job')
+        await destinateQueue.add(destinateJob, {
+          jobId: destinateJob.opts.jobId,
+        });
+        console.log('Queue stats: ', await destinateQueue.getJobCounts());
       }
       break;
     }
   }
 }
 queue.process(async (job) => {
-
-  // return {
-  //   caption: 'captionPath'
-  // }
+  if (process.env.DEBUG) {
+    await new Promise(r => setTimeout(r, Math.random() * 2_000));
+    mergeToQueue(job);
+    return {
+      caption: 'captionPath'
+    }
+  }
   console.log('Processing job', job.id);
-  console.log('Job data', job.data);
+  // console.log('Job data', job.data);
   let jobJson = '/tmp/job-' + job.id + '.json'
   fs.writeFileSync(jobJson, JSON.stringify(job.data));
   let compositeEngine = job.data.compositeEngine;
@@ -72,7 +78,7 @@ queue.process(async (job) => {
     let process = spawn('python3', [script, 'composite', jobJson]);
     process.stdout.on('data', (data) => {
       stdout += data.toString();
-      console.log(data)
+      // console.log(data)
     });
     process.stderr.on('data', (data) => {
       stderr += data.toString();
@@ -89,7 +95,7 @@ queue.process(async (job) => {
   });
   //
   let returnValue = JSON.parse(fs.readFileSync('/tmp/returnvalue.json'));
-  console.log('Return value', returnValue);
+  // console.log('Return value', returnValue);
   console.log('Stdout', stdout);
   console.log('Stderr', stderr);
   mergeToQueue(job);
