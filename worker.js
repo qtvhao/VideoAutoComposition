@@ -16,39 +16,39 @@ let opts = {
 let queue = new Queue(queueName, opts);
 let destinateQueue = new Queue(destinateQueueName, opts);
 
-queue.process(async (job) => {
-  (async function() {
-    let jobIds = job.data.videoScript.map((videoScript) => videoScript.jobId);
-    console.log('Job ids', jobIds);
-    for (let i = 0; i < 10; i++) {
-      await new Promise(r => setTimeout(r, 1000));
-      let jobs = await Promise.all(jobIds.map((jobId) => queue.getJob(jobId)));
-      let isAllJobsCompleted = jobs.every((job) => job && job.returnvalue);
-      console.log('isAllJobsCompleted', isAllJobsCompleted);
-      if (isAllJobsCompleted) {
-        let destinateJob = {
-          data: {
-            ...job.data,
-            videoScript: job.data.videoScript.map((videoScript) => {
-              let job = jobs.find((job) => job.id === videoScript.jobId);
-              return {
-                ...videoScript,
-                sequence_result_path: job.returnvalue.caption,
-              };
-            }),
-          },
-          opts: {
-            jobId: jobIds.reduce((acc, jobId) => acc + Number(jobId), 0),
-          }
-        };
-        if (!await destinateQueue.getJob(destinateJob.opts.jobId)) {
-          console.log('Adding destinate job', destinateJob.data);
-          await destinateQueue.add(destinateJob);
+async function mergeToQueue(job) {
+  let jobIds = job.data.videoScript.map((videoScript) => videoScript.jobId);
+  console.log('Job ids', jobIds);
+  for (let i = 0; i < 10; i++) {
+    await new Promise(r => setTimeout(r, 1000));
+    let jobs = await Promise.all(jobIds.map((jobId) => queue.getJob(jobId)));
+    let isAllJobsCompleted = jobs.every((job) => job && job.returnvalue);
+    console.log('isAllJobsCompleted', isAllJobsCompleted);
+    if (isAllJobsCompleted) {
+      let destinateJob = {
+        data: {
+          ...job.data,
+          videoScript: job.data.videoScript.map((videoScript) => {
+            let job = jobs.find((job) => job.id === videoScript.jobId);
+            return {
+              ...videoScript,
+              sequence_result_path: job.returnvalue.caption,
+            };
+          }),
+        },
+        opts: {
+          jobId: jobIds.reduce((acc, jobId) => acc + Number(jobId), 0),
         }
-        break;
+      };
+      if (!await destinateQueue.getJob(destinateJob.opts.jobId)) {
+        console.log('Adding destinate job', destinateJob.data);
+        await destinateQueue.add(destinateJob);
       }
+      break;
     }
-  })();
+  }
+}
+queue.process(async (job) => {
 
   // return {
   //   caption: 'captionPath'
@@ -92,6 +92,7 @@ queue.process(async (job) => {
   console.log('Return value', returnValue);
   console.log('Stdout', stdout);
   console.log('Stderr', stderr);
+  mergeToQueue(job);
 
   return returnValue;
 });
