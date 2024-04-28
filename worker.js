@@ -20,12 +20,39 @@ queue.process(async (job) => {
   (async function() {
     let jobIds = job.data.videoScript.map((videoScript) => videoScript.jobId);
     console.log('Job ids', jobIds);
-    // await destinateQueue.add(returnValue);
+    for (let i = 0; i < 10; i++) {
+      await new Promise(r => setTimeout(r, 1000));
+      let jobs = await Promise.all(jobIds.map((jobId) => queue.getJob(jobId)));
+      let isAllJobsCompleted = jobs.every((job) => job && job.returnvalue);
+      console.log('isAllJobsCompleted', isAllJobsCompleted);
+      if (isAllJobsCompleted) {
+        let destinateJob = {
+          data: {
+            ...job.data,
+            videoScript: job.data.videoScript.map((videoScript) => {
+              let job = jobs.find((job) => job.id === videoScript.jobId);
+              return {
+                ...videoScript,
+                sequence_result_path: job.returnvalue.caption,
+              };
+            }),
+          },
+          opts: {
+            jobId: jobIds.reduce((acc, jobId) => acc + Number(jobId), 0),
+          }
+        };
+        if (!await destinateQueue.getJob(destinateJob.opts.jobId)) {
+          console.log('Adding destinate job', destinateJob.data);
+          await destinateQueue.add(destinateJob);
+        }
+        break;
+      }
+    }
   })();
 
-  return {
-    returnValue: 'OK'
-  }
+  // return {
+  //   caption: 'captionPath'
+  // }
   console.log('Processing job', job.id);
   console.log('Job data', job.data);
   let jobJson = '/tmp/job-' + job.id + '.json'
@@ -76,7 +103,7 @@ if (process.env.DEBUG) {
     "articleId": "article_id",
     "videoScript": [
       {
-        "jobId": "job-1",
+        "jobId": "1000",
         "keywords": [],
         "image_stock_search_phrases": [],
         "keyword": "career opportunities",
@@ -242,11 +269,13 @@ if (process.env.DEBUG) {
   });
   let jobs = [];
   jobData.videoScript[1] = JSON.parse(JSON.stringify(jobData.videoScript[0]))
-  jobData.videoScript[1].jobId = 'job-2';
+  jobData.videoScript[1].jobId = '-2000';
   jobs.push(JSON.parse(JSON.stringify(jobData)));
   jobData.numberthOfParagraph = 1;
   jobs.push(JSON.parse(JSON.stringify(jobData)));
-  jobs.map((job) => {
-    queue.add(job);
+  jobs.map((job, i) => {
+    queue.add(job, {
+      jobId: jobData.videoScript[i].jobId,
+    });
   });
 }
