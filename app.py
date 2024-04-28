@@ -4,6 +4,7 @@ from src.captions import one_at_a_time
 import sys
 import json
 import random
+import os
 
 ASSETS_DIR = "/app/assets/"
 SRC_DIR = "/app/src/"
@@ -31,7 +32,12 @@ if __name__ == "__main__":
     engine = "simple"
     print(f"job: {job}")
     article_id = "" + job["articleId"]
-    output_file = "/tmp/composite-" + engine + "-" + article_id + ".mp4"
+
+    composite_sequences = "/app/storage/images/composite-sequences/"
+    if not os.path.exists(composite_sequences):
+        os.makedirs(composite_sequences)
+
+    output_file = composite_sequences + "composite-" + engine + "-" + article_id + ".mp4"
     print(f"route: {route}")
     print(f"engine: {engine}")
     print(f"output_file: {output_file}")
