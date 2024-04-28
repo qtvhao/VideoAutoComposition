@@ -26,7 +26,7 @@ if __name__ == "__main__":
     numberthOfParagraph = job["numberthOfParagraph"]
     paragraph = job["videoScript"][numberthOfParagraph]
     subtitle = paragraph["subtitle"]
-    sanitizedBaseDirectory = paragraph["sanitizedBaseDirectory"]
+    sanitizedBaseDirectory = paragraph["sanitizedBaseDirectory"] + "/"
     audio_file = paragraph["audioFilePath"]
     engine = "simple"
     print(f"job: {job}")

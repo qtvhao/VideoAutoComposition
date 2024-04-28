@@ -37,6 +37,7 @@ def combine_videos(combined_video_path: str|bool,
             # random.shuffle(video_paths)
 
         for video_path in video_paths:
+            print(f"processing {video_path}")
             clip = moviepy.VideoFileClip(video_path).without_audio()
             # Check if clip is longer than the remaining audio
             if (audio_duration - video_duration) < clip.duration:
