@@ -11,7 +11,6 @@ moviepy~=2.0.0.dev2
 # aiohttp~=3.9.3
 # urllib3~=2.2.1
 pillow~=10.3.0
-celery
 # pydantic~=2.6.3
 # g4f~=0.3.0.4
 # dashscope~=1.15.0
