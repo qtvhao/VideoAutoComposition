@@ -17,7 +17,7 @@ ENV PYTHONPATH="/app"
 COPY requirements.txt ./
 RUN . venv/bin/activate && pip install --no-cache-dir -r requirements.txt
 
-COPY --from=yarn /node_modules /app/node_modules
+COPY --from=yarn /app/node_modules /app/node_modules
 
 RUN cat /etc/ImageMagick-6/policy.xml | sed 's/none/read,write/g'> /etc/ImageMagick-6/policy.xml
 
