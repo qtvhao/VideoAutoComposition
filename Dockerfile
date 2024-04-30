@@ -1,6 +1,6 @@
 FROM ghcr.io/qtvhao/debian:main as yarn
 COPY yarn.lock package.json ./
-RUN yarn install
+RUN . venv/bin/activate && . /root/.nvm/nvm.sh && yarn install
 
 FROM ghcr.io/qtvhao/debian:main
 
