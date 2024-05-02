@@ -1,9 +1,7 @@
 let Queue = require('bull');
 let fs = require('fs');
 let { spawn } = require('child_process');
-// const path = require('path');
-
-// let assetsImageDir = path.join(__dirname, 'assets', 'image');
+console.log('Worker started');
 let queueName = process.env.QUEUE_NAME || 'video-auto-composition';
 let destinateQueueName = process.env.DESTINATE_QUEUE || 'video-auto-composition-result';
 let opts = {
@@ -52,7 +50,8 @@ async function mergeToQueue(job) {
   }
 }
 queue.process(async (job) => {
-  if (process.env.DEBUG) {
+  console.log('Processing job', job.id);
+  if (process.env.DEBUG && 0) {
     await new Promise(r => setTimeout(r, Math.random() * 2_000));
     mergeToQueue(job);
     return {
@@ -283,6 +282,11 @@ if (process.env.DEBUG) {
   jobs.map((job, i) => {
     queue.add(job, {
       jobId: jobData.videoScript[i].jobId,
+    }).then((job) => {
+      console.log('Job added', job.id);
+      queue.getJob(job.id).then((job) => {
+        console.log('Job', job.id, 'status', job.status);
+      });
     });
   });
 }

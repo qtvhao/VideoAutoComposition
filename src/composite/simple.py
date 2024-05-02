@@ -6,6 +6,46 @@ logs_file = "/tmp/logs.txt"
 output_folder = "/app/assets/outputs/"
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
+def log_color_clip(clip):
+    return (f"Clip type: {type(clip)}, duration: {clip.duration}, size: {clip.size}, color: {clip.color}\n")
+def has_filename(clip):
+    try:
+        return clip.filename
+    except AttributeError:
+        return False
+def log_composte_clip(clip):
+    clips_filenames = ""
+    for c in clip.clips:
+        if has_filename(c):
+            clips_filenames += c.filename + ", "
+
+    return (f"Clip type: {type(clip)}, duration: {clip.duration}, size: {clip.size}, path: {clips_filenames}\n")
+# def log_video_clip(clip):
+#     logs = open(logs_file, "w")
+#     logs.write(f"Clip type: {type(clip)}, duration: {clip.duration}, size: {clip.size}, path: {clip.filename}\n")
+#     logs.close()
+# def log_image_clip(clip):
+#     logs = open(logs_file, "w")
+#     logs.write(f"Clip type: {type(clip)}, duration: {clip.duration}, size: {clip.size}, path: {clip.filename}\n")
+#     logs.close()
+
+def log_normal_clip(clip):
+    return (f"Clip type: {type(clip)}, duration: {clip.duration}, size: {clip.size}, path: {clip.filename}\n")
+
+def log_clip(clip):
+    logs = open(logs_file, "w")
+    match = {
+        moviepy.VideoFileClip: log_normal_clip,
+        moviepy.ImageClip: log_normal_clip,
+        moviepy.TextClip: log_normal_clip,
+        moviepy.ColorClip: log_color_clip,
+        moviepy.CompositeVideoClip: log_composte_clip
+    }
+    print(f"Clip type: {type(clip)}")
+    log_line = match[type(clip)](clip)
+    logs.write(log_line)
+    logs.close()
+
 def combine_videos(combined_video_path: str|bool,
                    video_paths: List[str],
                    audio_file: str,
@@ -84,10 +124,8 @@ def combine_videos(combined_video_path: str|bool,
             clips.append(clip)
             video_duration += clip.duration
 
-    logs = open(logs_file, "w")
     for clip in clips:
-        logs.write(f"Clip type: {type(clip)}, duration: {clip.duration}, size: {clip.size}, path: {clip.filename}\n")
-    logs.close()
+        log_clip(clip)
     video_clip = moviepy.concatenate_videoclips(clips)
     video_clip = video_clip.set_audio(audio_clip)
     video_clip = video_clip.set_fps(30)
