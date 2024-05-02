@@ -4,6 +4,7 @@ from typing import List
 
 logs_file = "/tmp/logs.txt"
 output_folder = "/app/assets/outputs/"
+fps = 2
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
 def log_color_clip(clip):
@@ -86,7 +87,7 @@ def combine_videos(combined_video_path: str|bool,
             # Only shorten clips if the calculated clip length (req_dur) is shorter than the actual clip to prevent still image
             elif req_dur < clip.duration:
                 clip = clip.subclip(0, req_dur)
-            clip = clip.set_fps(30)
+            clip = clip.set_fps(fps)
 
             # Not all videos are same size, so we need to resize them
             clip_w, clip_h = clip.size
@@ -128,7 +129,7 @@ def combine_videos(combined_video_path: str|bool,
         log_clip(clip)
     video_clip = moviepy.concatenate_videoclips(clips)
     video_clip = video_clip.set_audio(audio_clip)
-    video_clip = video_clip.set_fps(30)
+    video_clip = video_clip.set_fps(fps)
     print(f"writing")
     # https://github.com/harry0703/MoneyPrinterTurbo/issues/111#issuecomment-2032354030
     if not combined_video_path:
@@ -137,7 +138,7 @@ def combine_videos(combined_video_path: str|bool,
                                threads=threads,
                             #    temp_audiofile_path=output_dir,
                                audio_codec=codec_name,
-                               fps=30,
+                               fps=fps,
                                )
     video_clip.close()
     print(f"completed")

@@ -3,6 +3,7 @@ import os
 import json
 
 # output_folder = "/app/assets/outputs/"
+fps = 2
 
 def one_word_at_a_time(subtitle, video_path, output_file):
     # 
@@ -51,7 +52,7 @@ def one_word_at_a_time(subtitle, video_path, output_file):
             "kerning": 5,
             "method": "caption",
             # "align": "center",
-            "fps": 30,
+            "fps": fps,
             "stroke_color": "black",
             "stroke_width": 1,
         }
@@ -60,11 +61,11 @@ def one_word_at_a_time(subtitle, video_path, output_file):
         image_of_styled_text = image_of_styled_text.set_start(start)
         image_of_styled_text = image_of_styled_text.set_end(end)
         image_of_styled_text = image_of_styled_text.set_duration(end-start)
-        image_of_styled_text = image_of_styled_text.set_fps(30)
+        image_of_styled_text = image_of_styled_text.set_fps(fps)
         image_of_styled_text = image_of_styled_text.set_position("center", "bottom")
         clips.append(image_of_styled_text)
     video_clip = moviepy.CompositeVideoClip(clips)
-    video_clip = video_clip.set_fps(30)
+    video_clip = video_clip.set_fps(fps)
     # output_file = output_folder + "output-one-word-at-a-time.mp4"
     video_clip.write_videofile(filename=output_file)
     video_clip.close()
