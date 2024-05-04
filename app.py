@@ -5,6 +5,7 @@ import sys
 import json
 import random
 import os
+import shutil
 
 ASSETS_DIR = "/app/assets/"
 SRC_DIR = "/app/src/"
@@ -46,12 +47,15 @@ if __name__ == "__main__":
     if route == "composite":
         if engine == "simple":
             randomId = random.randbytes(8).hex()
-            copied_audio_file = "/tmp/audio-" + randomId + ".mp3"
+            copied_sanitized_base_directory = f"/tmp/sanitized-{randomId}/"
+            copied_audio_file = f"/tmp/audio-{randomId}.mp3"
+            tmp_output_file = f"/tmp/composite-{randomId}.mp4"
             os.system(f"cp {audio_file} {copied_audio_file}")
-            copied_sanitized_base_directory = "/tmp/sanitizedBaseDirectory-" + randomId + "/"
             os.system(f"cp -r {sanitizedBaseDirectory} {copied_sanitized_base_directory}")
+
             compost = simple.simple_composite(copied_sanitized_base_directory, copied_audio_file, False)
             one_at_a_time.one_word_at_a_time(subtitle, compost, output_file)
+            shutil.move(tmp_output_file, output_file)
 
             logs = open(logs_file, "r").read()
 
