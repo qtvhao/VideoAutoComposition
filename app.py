@@ -46,7 +46,11 @@ if __name__ == "__main__":
     if route == "composite":
         if engine == "simple":
             randomId = random.randbytes(8).hex()
-            compost = simple.simple_composite(sanitizedBaseDirectory, audio_file, False)
+            copied_audio_file = "/tmp/audio-" + randomId + ".mp3"
+            os.system(f"cp {audio_file} {copied_audio_file}")
+            copied_sanitized_base_directory = "/tmp/sanitizedBaseDirectory-" + randomId + "/"
+            os.system(f"cp -r {sanitizedBaseDirectory} {copied_sanitized_base_directory}")
+            compost = simple.simple_composite(copied_sanitized_base_directory, copied_audio_file, False)
             one_at_a_time.one_word_at_a_time(subtitle, compost, output_file)
 
             logs = open(logs_file, "r").read()

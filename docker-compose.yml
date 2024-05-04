@@ -54,11 +54,12 @@ services:
     working_dir: /app
     volumes:
       - ./assets/image/:/app/storage/images/0/
-      - ./assets/audio/:/app/audio/
+      - ./assets/audio/:/app/storage/audio/
       - ./assets/outputs/:/app/storage/images/composite-sequences/
       - ./src/:/app/src/
       - ./templates/:/app/templates/
       - ./app.py:/app/app.py
+      - ./worker.json:/app/worker.json
       - ./worker.js:/app/worker.js
       - ./tmp/:/tmp/
     command: bash -c ". venv/bin/activate && node worker.js"
