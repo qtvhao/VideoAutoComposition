@@ -3,12 +3,13 @@ import os
 import random
 from typing import List
 # import moviepy.video.fx.all as vfx
+import cv2
 # from skimage.filters import gaussian_filter
 import skimage.filters as filters
 
 logs_file = "/tmp/logs.txt"
 output_folder = "/app/assets/outputs/"
-fps = 60
+fps = 2
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
 def log_color_clip(clip):
@@ -50,6 +51,29 @@ def log_clip(clip):
     log_line = match[type(clip)](clip)
     logs.write(log_line)
     logs.close()
+def slide_to(direction, speed_px_per_s, clip_w, clip_h, video_width, video_height):
+    # From 2/3 of the video, slide to the 1/3 of the video
+    twoThird = (video_width * 2 / 3 - clip_w / 2, video_height * 2 / 3 - clip_h / 2)
+    oneThird = (video_width * 1 / 3 - clip_w / 2, video_height * 1 / 3 - clip_h / 2)
+    if "left" in direction:
+        if twoThird[0] < 0:
+            twoThird = (0, twoThird[1])
+    if "top" in direction:
+        if twoThird[1] < 0:
+            twoThird = (twoThird[0], 0)
+    if "right" in direction:
+        if twoThird[0] > video_width - clip_w:
+            twoThird = (video_width - clip_w, twoThird[1])
+    if "bottom" in direction:
+        if twoThird[1] > video_height - clip_h:
+            twoThird = (twoThird[0], video_height - clip_h)
+    direction_map = {
+        "lefttop": lambda t: ( int(twoThird[0] - t * speed_px_per_s), int(twoThird[1] - t * speed_px_per_s) ),
+        "left": lambda t: ( int(twoThird[0] - t * speed_px_per_s), int(twoThird[1]) ),
+        "leftbottom": lambda t: ( int(twoThird[0] - t * speed_px_per_s), int(twoThird[1] + t * speed_px_per_s) ),
+        "top": lambda t: ( int(twoThird[0]), int(twoThird[1] - t * speed_px_per_s) ),
+    }
+    return direction_map[direction]
 
 def combine_videos(combined_video_path: str|bool,
                    video_paths: List[str],
@@ -123,40 +147,31 @@ def combine_videos(combined_video_path: str|bool,
                     new_width = int(clip_w * scale_factor)
                     new_height = int(clip_h * scale_factor)
                     clip_resized = clip.resize(newsize=(new_width, new_height))
-                    # clip_resized = clip_resized.fx(vfx.colorx, 2)
-                    def boxblur(image):
-                        return filters.gaussian(image, sigma=2)
-                    # (image.astype(float), sigma=2)
+                    # 
+                    if clip_h > video_height:
+                        clip_scale_factor = clip_h / video_height
+                        clip = clip.resize(newsize=(int(clip_w / clip_scale_factor), int(clip_h / clip_scale_factor)))
+                    if clip_w > video_width:
+                        clip_scale_factor = clip_w / video_width
+                        clip = clip.resize(newsize=(int(clip_w / clip_scale_factor), int(clip_h / clip_scale_factor)))
+
+                    def boxblur(input_frame):
+                        return cv2.GaussianBlur(input_frame, (15, 15), 0)
+                        # Use cv2 to apply a box blur to each frame
                         
-                    # clip_resized = clip_resized.fl_image(boxblur)
+                    clip_resized = clip_resized.fl_image(boxblur)
 
-                    def slide_to(direction, speed_px_per_s, scale_factor):
-                        direction_map = {
-                            "lefttop": [-1, -1],
-                            "left": [-1, 0],
-                            "leftbottom": [-1, 1],
-                            "top": [0, -1],
-                            "center": [0, 0],
-                            "bottom": [0, 1],
-                            "righttop": [1, -1],
-                            "right": [1, 0],
-                            "rightbottom": [1, 1],
-                        }
-                        direction_factor = direction_map.get(direction, [0, 0])
-
-                        return lambda t: (
-                            int(video_width / 2 + direction_factor[0] * t * speed_px_per_s),
-                            int(video_height / 2 + direction_factor[1] * t * speed_px_per_s)
-                        )
-
-                    directions = ["lefttop", "left", "leftbottom", "top", "center", "bottom", "righttop", "right", "rightbottom"]
+                    directions = [
+                        "lefttop", "left", "leftbottom", "top",
+                                  # "center", "bottom", "righttop", "right", "rightbottom"
+                    ]
                     random_direction = directions[random.randint(0, len(directions) - 1)]
                     print(f"random_direction: {random_direction}")
                     background = moviepy.ColorClip(size=(video_width, video_height), color=(0, 0, 0))
                     clip = moviepy.CompositeVideoClip([
                         background.set_duration(clip.duration),
                         clip_resized.set_position('center'),
-                        clip.set_position(slide_to(random_direction, speed_px_per_s=50, scale_factor=1.3))
+                        clip.set_position(slide_to(random_direction, 50, clip_w, clip_h, video_width, video_height))
                     ])
 
                 print(f"resizing video to {video_width} x {video_height}, clip size: {clip_w} x {clip_h}")
