@@ -1,10 +1,14 @@
 import moviepy.editor as moviepy
 import os
+import random
 from typing import List
+# import moviepy.video.fx.all as vfx
+# from skimage.filters import gaussian_filter
+import skimage.filters as filters
 
 logs_file = "/tmp/logs.txt"
 output_folder = "/app/assets/outputs/"
-fps = 5
+fps = 60
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
 def log_color_clip(clip):
@@ -108,22 +112,51 @@ def combine_videos(combined_video_path: str|bool,
                 else:
                     # 等比缩放视频
                     if clip_ratio > video_ratio:
-                        # 按照目标宽度等比缩放
-                        scale_factor = video_width / clip_w
-                    else:
-                        # 按照目标高度等比缩放
+                        # clip is wider than video, causing black bars on top and bottom
+                        # must cover the whole video, so scale to the height
                         scale_factor = video_height / clip_h
+                    else:
+                        # clip is taller than video, causing black bars on left and right
+                        # must cover the whole video, so scale to the width
+                        scale_factor = video_width / clip_w
 
                     new_width = int(clip_w * scale_factor)
                     new_height = int(clip_h * scale_factor)
                     clip_resized = clip.resize(newsize=(new_width, new_height))
                     # clip_resized = clip_resized.fx(vfx.colorx, 2)
-                    # clip_resized = clip_resized.fx(moviepy.vfx.blur.boxblur, 10, 10)
+                    def boxblur(image):
+                        return filters.gaussian(image, sigma=2)
+                    # (image.astype(float), sigma=2)
+                        
+                    # clip_resized = clip_resized.fl_image(boxblur)
 
+                    def slide_to(direction, speed_px_per_s, scale_factor):
+                        direction_map = {
+                            "lefttop": [-1, -1],
+                            "left": [-1, 0],
+                            "leftbottom": [-1, 1],
+                            "top": [0, -1],
+                            "center": [0, 0],
+                            "bottom": [0, 1],
+                            "righttop": [1, -1],
+                            "right": [1, 0],
+                            "rightbottom": [1, 1],
+                        }
+                        direction_factor = direction_map.get(direction, [0, 0])
+
+                        return lambda t: (
+                            int(video_width / 2 + direction_factor[0] * t * speed_px_per_s),
+                            int(video_height / 2 + direction_factor[1] * t * speed_px_per_s)
+                        )
+
+                    directions = ["lefttop", "left", "leftbottom", "top", "center", "bottom", "righttop", "right", "rightbottom"]
+                    random_direction = directions[random.randint(0, len(directions) - 1)]
+                    print(f"random_direction: {random_direction}")
                     background = moviepy.ColorClip(size=(video_width, video_height), color=(0, 0, 0))
                     clip = moviepy.CompositeVideoClip([
                         background.set_duration(clip.duration),
-                        clip_resized.set_position("center")
+                        clip_resized.set_position('center'),
+                        clip.set_position(slide_to(random_direction, speed_px_per_s=50, scale_factor=1.3))
                     ])
 
                 print(f"resizing video to {video_width} x {video_height}, clip size: {clip_w} x {clip_h}")
