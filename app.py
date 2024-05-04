@@ -54,9 +54,9 @@ if __name__ == "__main__":
             os.system(f"cp -r {sanitizedBaseDirectory} {copied_sanitized_base_directory}")
 
             compost = simple.simple_composite(copied_sanitized_base_directory, copied_audio_file, False)
-            one_at_a_time.one_word_at_a_time(subtitle, compost, output_file)
-            # shutil.move(tmp_output_file, output_file)
+            one_at_a_time.one_word_at_a_time(subtitle, compost, tmp_output_file)
             shutil.copyfile(tmp_output_file, output_file)
+            # clean up
             shutil.rmtree(copied_sanitized_base_directory)
             os.remove(copied_audio_file)
             os.remove(tmp_output_file)
