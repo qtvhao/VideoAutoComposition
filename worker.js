@@ -73,6 +73,7 @@ queue.process(async (job) => {
   let script = 'app.py'
   let stdout = '';
   let stderr = '';
+  await job.log(`python3 ${script} composite ${jobJson}`);
   await new Promise((resolve, reject) => {
     let process = spawn('python3', [script, 'composite', jobJson]);
     process.stdout.on('data', (data) => {
