@@ -9,7 +9,7 @@ import skimage.filters as filters
 
 logs_file = "/tmp/logs.txt"
 output_folder = "/app/assets/outputs/"
-fps = 2
+fps = 1
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
 def log_color_clip(clip):
@@ -51,27 +51,48 @@ def log_clip(clip):
     log_line = match[type(clip)](clip)
     logs.write(log_line)
     logs.close()
-def slide_to(direction, speed_px_per_s, clip_w, clip_h, video_width, video_height):
+def slide_to(direction, slide_duration_in_ms, clip_w, clip_h, video_width, video_height):
     # From 2/3 of the video, slide to the 1/3 of the video
-    twoThird = (video_width * 2 / 3 - clip_w / 2, video_height * 2 / 3 - clip_h / 2)
-    oneThird = (video_width * 1 / 3 - clip_w / 2, video_height * 1 / 3 - clip_h / 2)
+    # 
+    startRightX = video_width * 2 / 3 - clip_w / 2
+    endRightX = video_width * 1 / 3 - clip_w / 2
+    startBottomY = video_height * 2 / 3 - clip_h / 2
+    endBottomY = video_height * 1 / 3 - clip_h / 2
+    startLeftX = video_width * 1 / 3
+    endLeftX = video_width * 2 / 3
+    startTopY = video_height * 1 / 3
+    endTopY = video_height * 2 / 3
+    # 
+    startX = video_width / 2 - clip_w / 2
+    endX = video_width / 2 - clip_w / 2
+    startY = video_height / 2 - clip_h / 2
+    endY = video_height / 2 - clip_h / 2
     if "left" in direction:
-        if twoThird[0] < 0:
-            twoThird = (0, twoThird[1])
-    if "top" in direction:
-        if twoThird[1] < 0:
-            twoThird = (twoThird[0], 0)
+        startX = startRightX
+        endX = endRightX
     if "right" in direction:
-        if twoThird[0] > video_width - clip_w:
-            twoThird = (video_width - clip_w, twoThird[1])
+        startX = startLeftX
+        endX = endLeftX
+    if "top" in direction:
+        startY = startBottomY
+        endY = endBottomY
     if "bottom" in direction:
-        if twoThird[1] > video_height - clip_h:
-            twoThird = (twoThird[0], video_height - clip_h)
+        startY = startTopY
+        endY = endTopY
+
+    duration_portion = 0.001 / slide_duration_in_ms
+    gapX = endX - startX
+    gapY = endY - startY
     direction_map = {
-        "lefttop": lambda t: ( int(twoThird[0] - t * speed_px_per_s), int(twoThird[1] - t * speed_px_per_s) ),
-        "left": lambda t: ( int(twoThird[0] - t * speed_px_per_s), int(twoThird[1]) ),
-        "leftbottom": lambda t: ( int(twoThird[0] - t * speed_px_per_s), int(twoThird[1] + t * speed_px_per_s) ),
-        "top": lambda t: ( int(twoThird[0]), int(twoThird[1] - t * speed_px_per_s) ),
+        # "left": lambda t: ( int((duration_portion / t * gapX + startX)), startY),
+        "left": lambda t: ( int((startX + (endX - startX) * (t / (slide_duration_in_ms / 1000)))), startY),
+        "right": lambda t: ( int((duration_portion / t * gapX + startX)), startY),
+        "top": lambda t: ( startX, int((duration_portion / t * gapY + startY))),
+        "bottom": lambda t: ( startX, int((duration_portion / t * gapY + startY))),
+        "lefttop": lambda t: ( int((duration_portion / t * gapX + startX)), int((duration_portion / t * gapY + startY))),
+        "leftbottom": lambda t: ( int((duration_portion / t * gapX + startX)), int((duration_portion / t * gapY + startY))),
+        "righttop": lambda t: ( int((duration_portion / t * gapX + startX)), int((duration_portion / t * gapY + startY))),
+        "rightbottom": lambda t: ( int((duration_portion / t * gapX + startX)), int((duration_portion / t * gapY + startY))),
     }
     return direction_map[direction]
 
@@ -148,6 +169,7 @@ def combine_videos(combined_video_path: str|bool,
                     new_height = int(clip_h * scale_factor)
                     clip_resized = clip.resize(newsize=(new_width, new_height))
                     # 
+                    clip_scale_factor = 1
                     if clip_h > video_height:
                         clip_scale_factor = clip_h / video_height
                         clip = clip.resize(newsize=(int(clip_w / clip_scale_factor), int(clip_h / clip_scale_factor)))
@@ -162,8 +184,8 @@ def combine_videos(combined_video_path: str|bool,
                     clip_resized = clip_resized.fl_image(boxblur)
 
                     directions = [
-                        "lefttop", "left", "leftbottom", "top",
-                                  # "center", "bottom", "righttop", "right", "rightbottom"
+                        "left", # "right", "top", "bottom",
+                        # "lefttop", "leftbottom", "righttop", "rightbottom"
                     ]
                     random_direction = directions[random.randint(0, len(directions) - 1)]
                     print(f"random_direction: {random_direction}")
@@ -171,7 +193,7 @@ def combine_videos(combined_video_path: str|bool,
                     clip = moviepy.CompositeVideoClip([
                         background.set_duration(clip.duration),
                         clip_resized.set_position('center'),
-                        clip.set_position(slide_to(random_direction, 50, clip_w, clip_h, video_width, video_height))
+                        clip.set_position(slide_to(random_direction, (clip.duration * 1000), clip_w / clip_scale_factor, clip_h / clip_scale_factor, video_width, video_height))
                     ])
 
                 print(f"resizing video to {video_width} x {video_height}, clip size: {clip_w} x {clip_h}")
