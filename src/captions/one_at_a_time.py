@@ -3,7 +3,7 @@ import os
 import json
 
 # output_folder = "/app/assets/outputs/"
-fps = 2
+fps = 30
 
 def one_word_at_a_time(subtitle, video_path, output_file):
     # 
