@@ -4,7 +4,7 @@ from typing import List
 
 logs_file = "/tmp/logs.txt"
 output_folder = "/app/assets/outputs/"
-fps = 30
+fps = 5
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
 def log_color_clip(clip):
@@ -97,6 +97,10 @@ def combine_videos(combined_video_path: str|bool,
             if clip_w != video_width or clip_h != video_height:
                 clip_ratio = clip.w / clip.h
                 video_ratio = video_width / video_height
+                if ((622 * 622) / (clip_w * clip_h)) > 1.25:
+                    print(f"video {video_path} is too small ({clip_w} x {clip_h} = {clip_w * clip_h}) for {622} x {622} = {622 * 622}, ratio {(622 * 622) / (clip_w * clip_h)}")
+                    continue
+                print(f"video {video_path} is {clip_w} x {clip_h}, ratio ({(clip_w * clip_h) / (622 * 622)})")
 
                 if clip_ratio == video_ratio:
                     # 等比例缩放
@@ -113,6 +117,8 @@ def combine_videos(combined_video_path: str|bool,
                     new_width = int(clip_w * scale_factor)
                     new_height = int(clip_h * scale_factor)
                     clip_resized = clip.resize(newsize=(new_width, new_height))
+                    # clip_resized = clip_resized.fx(vfx.colorx, 2)
+                    # clip_resized = clip_resized.fx(moviepy.vfx.blur.boxblur, 10, 10)
 
                     background = moviepy.ColorClip(size=(video_width, video_height), color=(0, 0, 0))
                     clip = moviepy.CompositeVideoClip([

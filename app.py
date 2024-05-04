@@ -50,13 +50,16 @@ if __name__ == "__main__":
             copied_sanitized_base_directory = f"/tmp/sanitized-{randomId}/"
             copied_audio_file = f"/tmp/audio-{randomId}.mp3"
             tmp_output_file = f"/tmp/composite-{randomId}.mp4"
+            tmp_output_file_captioned = f"/tmp/composite-captioned-{randomId}.mp4"
             os.system(f"cp {audio_file} {copied_audio_file}")
             os.system(f"cp -r {sanitizedBaseDirectory} {copied_sanitized_base_directory}")
 
-            compost = simple.simple_composite(copied_sanitized_base_directory, copied_audio_file, False)
-            one_at_a_time.one_word_at_a_time(subtitle, compost, tmp_output_file)
-            shutil.copyfile(tmp_output_file, output_file)
+            simple.simple_composite(copied_sanitized_base_directory, copied_audio_file, tmp_output_file)
+            one_at_a_time.one_word_at_a_time(subtitle, tmp_output_file, tmp_output_file_captioned)
+            shutil.copyfile(tmp_output_file_captioned, output_file)
+            print(f"Copied {tmp_output_file_captioned} to {output_file}")
             # clean up
+            # . venv/bin/activate; python3 app.py composite /tmp/job-*
             shutil.rmtree(copied_sanitized_base_directory)
             os.remove(copied_audio_file)
             os.remove(tmp_output_file)

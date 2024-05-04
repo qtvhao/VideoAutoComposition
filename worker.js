@@ -78,22 +78,25 @@ queue.process(async (job) => {
     let process = spawn('python3', [script, 'composite', jobJson]);
     process.stdout.on('data', (data) => {
       stdout += data.toString();
+      job.log(data.toString());
       // console.log(data)
     });
     process.stderr.on('data', (data) => {
       stderr += data.toString();
+      job.log(data.toString());
       console.error(`stderr: ${data}`);
     });
     process.on('close', (code) => {
       if (code !== 0) {
         console.error(`child process exited with code ${code}`);
-        reject(stderr);
+        return reject(stderr);
       }
       console.log(`child process exited with code ${code}`);
       resolve(stdout);
     });
   });
   //
+  throw new Error('Error');
   let returnValue = JSON.parse(fs.readFileSync('/tmp/returnvalue.json'));
   // console.log('Return value', returnValue);
   console.log('Stdout', stdout);
@@ -111,7 +114,7 @@ if (process.env.DEBUG) {
   jobData.videoScript[numberthOfParagraph + 1].jobId = '-2000';
   jobs.push(JSON.parse(JSON.stringify(jobData)));
   jobData.numberthOfParagraph = 1;
-  jobs.push(JSON.parse(JSON.stringify(jobData)));
+  // jobs.push(JSON.parse(JSON.stringify(jobData)));
   jobs.map((job, i) => {
     queue.add(job, {
       jobId: jobData.videoScript[i].jobId,
