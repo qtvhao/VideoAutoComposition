@@ -2,8 +2,9 @@ import moviepy.editor as moviepy
 import os
 import random
 from typing import List
-# import moviepy.video.fx.all as vfx
+import moviepy.video.fx.all as vfx
 import cv2
+import numpy as np
 # from skimage.filters import gaussian_filter
 import skimage.filters as filters
 
@@ -54,27 +55,33 @@ def log_clip(clip):
 def slide_to(direction, slide_duration_in_ms, clip_w, clip_h, video_width, video_height):
     # From 2/3 of the video, slide to the 1/3 of the video
     # 
+    middle_of_video_y = video_height / 2 - clip_h / 2
+    center_of_video_x = video_width / 2 - clip_w / 2
     if "left" in direction:
-        startX = video_width * 9 / 10 - clip_w # start from the right of the video and move to the left, gap is 1/10 of the video width
-        endX = video_width * 1 / 10 # end at the left of the video, gap is 1/10 of the video width
-        startY  = video_height / 2  - clip_h / 2    # move start from the middle of the video
-        endY    = video_height / 2  - clip_h / 2    # move end at the middle of the video
+        startX = video_width * 0.6 - clip_w # start from the right of the video and move to the left, gap is 1/10 of the video width
+        endX = video_width * 0.3 # end at the left of the video, gap is 1/10 of the video width
+        startY  = middle_of_video_y    # move start from the middle of the video
+        endY    = middle_of_video_y    # move end at the middle of the video
     if "right" in direction:
-        startX = video_width * 1 / 10 # start from the left of the video and move to the right, gap is 1/10 of the video width
-        endX = video_width * 9 / 10 - clip_w # end at the right of the video, gap is 1/10 of the video width
-        startY  = video_height / 2  - clip_h / 2    # start from the center of the video
-        endY    = video_height / 2  - clip_h / 2    # end at the center of the video
+        startX = video_width * 0.3 # start from the left of the video and move to the right, gap is 1/10 of the video width
+        endX = video_width * 0.6 - clip_w # end at the right of the video, gap is 1/10 of the video width
+        startY  = middle_of_video_y    # start from the center of the video
+        endY    = middle_of_video_y    # end at the center of the video
     if "top" in direction:
-        startX = video_width / 2 - clip_w / 2 # start from the center of the video
-        endX = video_width / 2 - clip_w / 2 # end at the center of the video
-        startY = video_height * 9 / 10 - clip_h # start from the bottom of the video, gap is 1/10 of the video height
-        endY = video_height * 1 / 10 # end at the top of the video, gap is 1/10 of the video height
+        startX = center_of_video_x # start from the center of the video
+        endX = center_of_video_x # end at the center of the video
+        startY = video_height * 0.6 - clip_h # start from the bottom of the video, gap is 1/10 of the video height
+        endY = video_height * 0.3 # end at the top of the video, gap is 1/10 of the video height
     if "bottom" in direction:
-        startX = video_width / 2 - clip_w / 2 # start from the center of the video
-        endX = video_width / 2 - clip_w / 2 # end at the center of the video
-        startY = video_height * 1 / 10 # start from the top of the video, gap is 1/10 of the video height
-        endY = video_height * 9 / 10 - clip_h # end at the bottom of the video, gap is 1/10 of the video height
+        startX = center_of_video_x # start from the center of the video
+        endX = center_of_video_x # end at the center of the video
+        startY = video_height * 0.3 # start from the top of the video, gap is 1/10 of the video height
+        endY = video_height * 0.6 - clip_h # end at the bottom of the video, gap is 1/10 of the video height
 
+    if endX < 0:
+        raise(f"endX is less than 0, endX: {endX}, video_width: {video_width}, clip_w: {clip_w}")
+    if endY < 0:
+        raise(f"endY is less than 0, endY: {endY}, video_height: {video_height}, clip_h: {clip_h}")
     # duration_portion = 0.001 / slide_duration_in_ms
     return lambda t: ( int((endX - startX) * (t / (slide_duration_in_ms / 1000)) + startX), int((endY - startY) * (t / (slide_duration_in_ms / 1000)) + startY) )
     # gapX = endX - startX
@@ -180,16 +187,19 @@ def combine_videos(combined_video_path: str|bool,
                     clip_resized = clip_resized.fl_image(boxblur)
 
                     directions = [
-                        "left", "right", "top", "bottom",
+                        "left", # "right", "top", "bottom",
                         # "lefttop", "leftbottom", "righttop", "rightbottom"
                     ]
                     random_direction = directions[random.randint(0, len(directions) - 1)]
                     print(f"random_direction: {random_direction}")
                     background = moviepy.ColorClip(size=(video_width, video_height), color=(0, 0, 0))
+                    # fx.all.colorx
+                    clip_resized = clip_resized.fl_image( lambda pic: np.minimum(255,(.9*pic)).astype('uint8'))
                     clip = moviepy.CompositeVideoClip([
                         background.set_duration(clip.duration),
                         clip_resized.set_position('center'),
-                        clip.set_position(slide_to(random_direction, (clip.duration * 1000), clip_w / clip_scale_factor, clip_h / clip_scale_factor, video_width, video_height))
+                        clip.set_position('center')
+                        # clip.set_position(slide_to(random_direction, (clip.duration * 1000), clip_w / clip_scale_factor, clip_h / clip_scale_factor, video_width, video_height))
                     ])
 
                 print(f"resizing video to {video_width} x {video_height}, clip size: {clip_w} x {clip_h}")

@@ -79,7 +79,7 @@ queue.process(async (job) => {
     process.stdout.on('data', (data) => {
       stdout += data.toString();
       job.log(data.toString());
-      // console.log(data)
+      console.log(data.toString());
     });
     process.stderr.on('data', (data) => {
       stderr += data.toString();
