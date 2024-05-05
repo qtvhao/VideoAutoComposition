@@ -5,7 +5,7 @@ import json
 # output_folder = "/app/assets/outputs/"
 fps = 60
 
-def one_word_at_a_time(subtitle, video_path, output_file):
+def one_word_at_a_time(subtitle, audio_file, video_path, output_file):
     # 
     if isinstance(video_path, str):
         video = moviepy.VideoFileClip(video_path)
@@ -14,6 +14,10 @@ def one_word_at_a_time(subtitle, video_path, output_file):
     clips = [
         video
     ]
+    audio_clip = moviepy.AudioFileClip(audio_file)
+    codec_name = "aac"
+    if audio_file.endswith(".mp3"):
+        codec_name = "libmp3lame"
     reduced_text = ""
     marker_for_same_line = False
     marker_start = 0
@@ -66,8 +70,9 @@ def one_word_at_a_time(subtitle, video_path, output_file):
         clips.append(image_of_styled_text)
     video_clip = moviepy.CompositeVideoClip(clips)
     video_clip = video_clip.set_fps(fps)
+    video_clip = video_clip.set_audio(audio_clip)
     # output_file = output_folder + "output-one-word-at-a-time.mp4"
-    video_clip.write_videofile(filename=output_file)
+    video_clip.write_videofile(filename=output_file,audio_codec=codec_name)
     video_clip.close()
     print("done")
 

@@ -61,7 +61,7 @@ if __name__ == "__main__":
             # os.system(f"cp -r {sanitizedBaseDirectory} {copied_sanitized_base_directory}")
 
             simple.simple_composite(copied_sanitized_base_directory, copied_audio_file, tmp_output_file)
-            one_at_a_time.one_word_at_a_time(subtitle, tmp_output_file, tmp_output_file_captioned)
+            one_at_a_time.one_word_at_a_time(subtitle, copied_audio_file, tmp_output_file, tmp_output_file_captioned)
             shutil.copyfile(tmp_output_file_captioned, output_file)
             print(f"Copied {tmp_output_file_captioned} to {output_file}")
             # clean up

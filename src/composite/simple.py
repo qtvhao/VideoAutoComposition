@@ -5,6 +5,8 @@ from typing import List
 import moviepy.video.fx.all as vfx
 import cv2
 import numpy as np
+import random
+import time
 # from skimage.filters import gaussian_filter
 import skimage.filters as filters
 
@@ -213,18 +215,21 @@ def combine_videos(combined_video_path: str|bool,
     for clip in clips:
         log_clip(clip)
     video_clip = moviepy.concatenate_videoclips(clips)
-    video_clip = video_clip.set_audio(audio_clip)
+    # video_clip = video_clip.set_audio(audio_clip)
     video_clip = video_clip.set_fps(fps)
     print(f"writing")
     # https://github.com/harry0703/MoneyPrinterTurbo/issues/111#issuecomment-2032354030
     if not combined_video_path:
         return video_clip
+    started_at = time.time()
     video_clip.write_videofile(filename=combined_video_path,
                                threads=threads,
                             #    temp_audiofile_path=output_dir,
-                               audio_codec=codec_name,
+                            #    audio_codec=codec_name,
                                fps=fps,
                                )
+    ended_at = time.time()
+    print(f"Process took {ended_at - started_at} seconds")
     video_clip.close()
     print(f"completed")
 
