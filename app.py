@@ -52,7 +52,12 @@ if __name__ == "__main__":
             tmp_output_file = f"/tmp/composite-{randomId}.mp4"
             tmp_output_file_captioned = f"/tmp/composite-captioned-{randomId}.mp4"
             os.system(f"cp {audio_file} {copied_audio_file}")
-            os.system(f"cp -r {sanitizedBaseDirectory} {copied_sanitized_base_directory}")
+            sanitizedFiles = os.listdir(sanitizedBaseDirectory)
+            for sanitizedFile in sanitizedFiles:
+                if not sanitizedFile.endswith("blur.mp4"):
+                    print(f"Copying {sanitizedBaseDirectory + sanitizedFile} to {copied_sanitized_base_directory + sanitizedFile}")
+                    shutil.copyfile(sanitizedBaseDirectory + sanitizedFile, copied_sanitized_base_directory + sanitizedFile)
+            # os.system(f"cp -r {sanitizedBaseDirectory} {copied_sanitized_base_directory}")
 
             simple.simple_composite(copied_sanitized_base_directory, copied_audio_file, tmp_output_file)
             one_at_a_time.one_word_at_a_time(subtitle, tmp_output_file, tmp_output_file_captioned)
