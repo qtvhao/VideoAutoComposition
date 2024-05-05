@@ -48,6 +48,7 @@ if __name__ == "__main__":
         if engine == "simple":
             randomId = random.randbytes(8).hex()
             copied_sanitized_base_directory = f"/tmp/sanitized-{randomId}/"
+            os.makedirs(copied_sanitized_base_directory)
             copied_audio_file = f"/tmp/audio-{randomId}.mp3"
             tmp_output_file = f"/tmp/composite-{randomId}.mp4"
             tmp_output_file_captioned = f"/tmp/composite-captioned-{randomId}.mp4"
