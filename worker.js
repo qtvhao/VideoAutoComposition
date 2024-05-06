@@ -58,6 +58,16 @@ queue.process(async (job) => {
       caption: 'captionPath'
     }
   }
+  let jobIds = job.data.videoScript.map((videoScript) => videoScript.jobId);
+  let jobs = await Promise.all(jobIds.map((jobId) => queue.getJob(jobId)));
+  let missingJobsIds = jobIds.filter((jobId) => !jobs.find((job) => job && job.id === jobId));
+  // Check if all jobs are present
+  let isAllJobsPresent = jobs.every((job) => job);
+  console.log('isAllJobsPresent', isAllJobsPresent);
+  if (!isAllJobsPresent) {
+    throw new Error('Some jobs are missing. Those are ' + missingJobsIds.join(', '));
+  }
+  
   console.log('Processing job', job.id);
   // console.log('Job data', job.data);
   let jobJson = '/tmp/job-' + job.id + '.json'
