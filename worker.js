@@ -65,7 +65,7 @@ queue.process(async (job) => {
   let isAllJobsPresent = jobs.every((job) => job);
   console.log('isAllJobsPresent', isAllJobsPresent);
   if (!isAllJobsPresent) {
-    throw new Error('Some jobs are missing. Those are ' + missingJobsIds.join(', '));
+    job.log('Some jobs are missing. Those are ' + missingJobsIds.join(', '));
   }
   
   console.log('Processing job', job.id);
