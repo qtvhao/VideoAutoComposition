@@ -96,7 +96,6 @@ queue.process(async (job) => {
     });
   });
   //
-  throw new Error('Error');
   let returnValue = JSON.parse(fs.readFileSync('/tmp/returnvalue.json'));
   // console.log('Return value', returnValue);
   console.log('Stdout', stdout);
