@@ -46,6 +46,16 @@ async function mergeToQueue(job) {
         console.log('Queue stats: ', await destinateQueue.getJobCounts());
       }
       break;
+    }else{
+      let jobIds = job.data.videoScript.map((videoScript) => videoScript.jobId);
+      let jobs = await Promise.all(jobIds.map((jobId) => queue.getJob(jobId)));
+      let missingJobsIds = jobIds.filter((jobId) => !jobs.find((job) => job && job.id === jobId));
+      // Check if all jobs are present
+      let isAllJobsPresent = jobs.every((job) => job);
+      console.log('isAllJobsPresent', isAllJobsPresent);
+      if (!isAllJobsPresent) {
+        job.log('Some jobs are missing. Those are ' + missingJobsIds.join(', '));
+      }
     }
   }
 }
@@ -57,15 +67,6 @@ queue.process(async (job) => {
     return {
       caption: 'captionPath'
     }
-  }
-  let jobIds = job.data.videoScript.map((videoScript) => videoScript.jobId);
-  let jobs = await Promise.all(jobIds.map((jobId) => queue.getJob(jobId)));
-  let missingJobsIds = jobIds.filter((jobId) => !jobs.find((job) => job && job.id === jobId));
-  // Check if all jobs are present
-  let isAllJobsPresent = jobs.every((job) => job);
-  console.log('isAllJobsPresent', isAllJobsPresent);
-  if (!isAllJobsPresent) {
-    job.log('Some jobs are missing. Those are ' + missingJobsIds.join(', '));
   }
   
   console.log('Processing job', job.id);
@@ -94,7 +95,12 @@ queue.process(async (job) => {
     process.stderr.on('data', (data) => {
       stderr += data.toString();
       job.log(data.toString());
+      if (data.toString().indexOf('%') !== -1) {
+        let percentage = data.toString().match(/\d+/)[0];
+        job.progress(Number(percentage));
+      }else{
       console.error(`stderr: ${data}`);
+      }
     });
     process.on('close', (code) => {
       if (code !== 0) {
