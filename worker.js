@@ -94,12 +94,12 @@ queue.process(async (job) => {
     });
     process.stderr.on('data', (data) => {
       stderr += data.toString();
-      job.log(data.toString());
       if (data.toString().indexOf('%') !== -1) {
         let percentage = data.toString().match(/\d+/)[0];
-        job.progress(Number(percentage));
+          job.progress(Number(percentage));
       }else{
-      console.error(`stderr: ${data}`);
+        job.log(data.toString());
+        console.error(`stderr: ${data}`);
       }
     });
     process.on('close', (code) => {

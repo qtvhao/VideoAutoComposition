@@ -32,7 +32,7 @@ if __name__ == "__main__":
     sanitizedBaseDirectory = paragraph["sanitizedBaseDirectory"] + "/"
     audio_file = paragraph["audioFilePath"]
     engine = "simple"
-    print(f"job: {job}")
+    # print(f"job: {job}")
     jobId = "" + paragraph["jobId"]
 
     composite_sequences = "/app/storage/images/composite-sequences/"
