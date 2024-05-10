@@ -59,7 +59,12 @@ async function mergeToQueue(job) {
 
         for (let ancestorsQueue of ancestorsQueues) {
           let ancestorsJobs = await Promise.all(missingJobsIds.map((jobId) => ancestorsQueue.getJob(jobId)));
-          let ancestorsStates = ancestorsJobs.map((job) => job && job.state);
+          let ancestorsStates = ancestorsJobs.map((job) => {
+            return JSON.stringify({
+              job: typeof job,
+              state: job?.state,
+            })
+          });
           job.log('Ancestors states: ' + ancestorsStates.join(', ') + ' for ' + ancestorsQueue.name);
         }
       }
