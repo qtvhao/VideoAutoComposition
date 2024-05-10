@@ -13,6 +13,7 @@ let opts = {
 };
 let queue = new Queue(queueName, opts);
 let destinateQueue = new Queue(destinateQueueName, opts);
+let ancestorsQueues = process.env.ANCESTORS_QUEUES.split(';').map((queueName) => new Queue(queueName, opts))
 
 async function mergeToQueue(job) {
   let jobIds = job.data.videoScript.map((videoScript) => videoScript.jobId);
@@ -55,11 +56,17 @@ async function mergeToQueue(job) {
       console.log('isAllJobsPresent', isAllJobsPresent);
       if (!isAllJobsPresent) {
         job.log('Some jobs are missing. Those are ' + missingJobsIds.join(', '));
+
+        for (let ancestorsQueue of ancestorsQueues) {
+          let ancestorsJobs = await Promise.all(missingJobsIds.map((jobId) => ancestorsQueue.getJob(jobId)));
+          let ancestorsStates = ancestorsJobs.map((job) => job && job.state);
+          job.log('Ancestors states: ' + ancestorsStates.join(', ') + ' for ' + ancestorsQueue.name);
+        }
       }
     }
   }
 }
-queue.process(async (job) => {
+let Processor = (async (job) => {
   console.log('Processing job', job.id);
   if (process.env.DEBUG && 0) {
     await new Promise(r => setTimeout(r, Math.random() * 2_000));
@@ -120,6 +127,7 @@ queue.process(async (job) => {
 
   return returnValue;
 });
+queue.process(Processor)
 
 if (process.env.DEBUG) {
   let jobData = require('./worker.json').data
