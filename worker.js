@@ -27,6 +27,7 @@ async function mergeToQueue(job) {
       let destinateJob = {
         data: {
           ...job.data,
+          compositeEngine: 'merge',
           videoScript: job.data.videoScript.map((videoScript) => {
             let job = jobs.find((job) => job.id === videoScript.jobId);
             return {
@@ -41,7 +42,7 @@ async function mergeToQueue(job) {
       };
       if (!await destinateQueue.getJob(destinateJob.opts.jobId)) {
         console.log('Adding destinate job')
-        await destinateQueue.add(destinateJob, {
+        await destinateQueue.add(destinateJob.data, {
           jobId: destinateJob.opts.jobId,
         });
         console.log('Queue stats: ', await destinateQueue.getJobCounts());
