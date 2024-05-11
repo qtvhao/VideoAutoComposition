@@ -56,7 +56,7 @@ if __name__ == "__main__":
             for sequence_result_path in sequence_result_paths:
                 shutil.copyfile(sequence_result_path, copied_composite_base_directory + os.path.basename(sequence_result_path))
 
-            simple.simple_composite(copied_composite_base_directory, False, tmp_output_file)
+            simple.simple_merge(copied_composite_base_directory, tmp_output_file)
             shutil.copyfile(tmp_output_file, output_file)
             print(f"Copied {tmp_output_file} to {output_file}")
             shutil.rmtree(copied_composite_base_directory)
