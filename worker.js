@@ -107,13 +107,15 @@ let Processor = (async (job) => {
     let progress = 0
     process.stderr.on('data', (data) => {
       stderr += data.toString();
-      console.log(data.toString());
+//      console.log(data.toString());
       if (data.toString().indexOf('%') !== -1) {
         let percentage = data.toString().match(/\d+/)[0];
         if (percentage === progress) {
           job.log(data.toString());
           return;
         }
+        progress = percentage;
+        console.log('Progress', percentage);
         job.progress(Number(percentage));
       }else{
         job.log(data.toString());
