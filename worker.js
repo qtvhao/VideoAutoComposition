@@ -13,7 +13,7 @@ let opts = {
 };
 let queue = new Queue(queueName, opts);
 let destinateQueue = new Queue(destinateQueueName, opts);
-let ancestorsQueues = process.env.ANCESTORS_QUEUES.split(';').map((queueName) => new Queue(queueName, opts))
+let ancestorsQueues = (process.env.ANCESTORS_QUEUES || '').split(';').map((queueName) => new Queue(queueName, opts))
 
 async function mergeToQueue(job) {
   let jobIds = job.data.videoScript.map((videoScript) => videoScript.jobId);
@@ -85,7 +85,7 @@ let Processor = (async (job) => {
   // console.log('Job data', job.data);
   let jobJson = '/tmp/job-' + job.id + '.json'
   fs.writeFileSync(jobJson, JSON.stringify(job.data));
-  let compositeEngine = job.data.compositeEngine;
+  let compositeEngine = job.data.compositeEngine ?? 'composite';
   if (compositeEngine) {
     console.log('Composite engine', compositeEngine);
   }
@@ -98,17 +98,23 @@ let Processor = (async (job) => {
   let stderr = '';
   await job.log(`python3 ${script} composite ${jobJson}`);
   await new Promise((resolve, reject) => {
-    let process = spawn('python3', [script, 'composite', jobJson]);
+    let process = spawn('python3', [script, compositeEngine, jobJson]);
     process.stdout.on('data', (data) => {
       stdout += data.toString();
       job.log(data.toString());
       console.log(data.toString());
     });
+    let progress = 0
     process.stderr.on('data', (data) => {
       stderr += data.toString();
+      console.log(data.toString());
       if (data.toString().indexOf('%') !== -1) {
         let percentage = data.toString().match(/\d+/)[0];
-          job.progress(Number(percentage));
+        if (percentage === progress) {
+          job.log(data.toString());
+          return;
+        }
+        job.progress(Number(percentage));
       }else{
         job.log(data.toString());
         console.error(`stderr: ${data}`);
@@ -134,6 +140,13 @@ let Processor = (async (job) => {
 });
 queue.process(Processor)
 
+if (process.env.DEBUG_MERGE) {
+  let jobData2 = require('./job_merge.json').data.data
+  queue.add({
+    compositeEngine: 'merge',
+    ...jobData2
+  }, {})
+}
 if (process.env.DEBUG) {
   let jobData = require('./worker.json').data
   let jobs = [];

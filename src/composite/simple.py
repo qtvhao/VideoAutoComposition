@@ -12,7 +12,7 @@ import skimage.filters as filters
 
 logs_file = "/tmp/logs.txt"
 output_folder = "/app/assets/outputs/"
-fps = 60
+fps = 10
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
 def log_color_clip(clip):
@@ -109,11 +109,14 @@ def combine_videos(combined_video_path: str|bool,
                    max_clip_duration: int = 5,
                    threads: int = 2,
                    ) -> str:
-    audio_clip = moviepy.AudioFileClip(audio_file)
-    codec_name = "aac"
-    if audio_file.endswith(".mp3"):
-        codec_name = "libmp3lame"
-    audio_duration = audio_clip.duration
+    if audio_file is not False:
+        audio_clip = moviepy.AudioFileClip(audio_file)
+        audio_duration = audio_clip.duration
+    else:
+        audio_duration = 0
+        for i, video_path in enumerate(video_paths):
+            clip = moviepy.VideoFileClip(video_path)
+            audio_duration += clip.duration
     print(f"max duration of audio: {audio_duration} seconds")
     # Required duration of each clip
     req_dur = audio_duration / len(video_paths)
@@ -137,7 +140,9 @@ def combine_videos(combined_video_path: str|bool,
             if video_duration >= audio_duration: # check if the video duration is greater than the audio duration
                 print(f"video duration {video_duration} is greater than audio duration {audio_duration}, breaking loop")
                 break
-            clip = moviepy.VideoFileClip(video_path).without_audio()
+            clip = moviepy.VideoFileClip(video_path)
+            if audio_file is not False:
+                clip = clip.without_audio()
             # Check if clip is longer than the remaining audio
             if (audio_duration - video_duration) < clip.duration:
                 clip = clip.subclip(0, (audio_duration - video_duration))
@@ -257,6 +262,8 @@ def simple_composite(image_dir, audio_file, output_file):
 
     # final_clip = moviepy.concatenate_videoclips(clips)
     # final_clip = final_clip.set_audio(moviepy.AudioFileClip(audio_dir + audio_file))
-    return (combine_videos(output_file, [image_dir + image_file for image_file in images_files], audio_file))
+    # 193.65498566627502 seconds on 2 threads
+    # 195 seconds on 8 thread
+    return (combine_videos(output_file, [image_dir + image_file for image_file in images_files], audio_file, 5, 8))
     # final_clip.write_videofile(output_file, codec="libx264", audio_codec="aac")
     # print("Done")

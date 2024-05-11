@@ -48,7 +48,7 @@ services:
     build: .
     container_name: video-auto-composition
     environment:
-      - "DEBUG=1"
+      - "DEBUG_MERGE=1"
     ports:
       - "5000:5000"
     working_dir: /app
@@ -59,6 +59,7 @@ services:
       - ./src/:/app/src/
       - ./templates/:/app/templates/
       - ./app.py:/app/app.py
+      - ./job_merge.json:/app/job_merge.json
       - ./worker.json:/app/worker.json
       - ./worker.js:/app/worker.js
       - ./tmp/:/tmp/

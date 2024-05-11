@@ -44,6 +44,33 @@ if __name__ == "__main__":
     print(f"engine: {engine}")
     print(f"output_file: {output_file}")
     print(f"audio_file: {audio_file}")
+    randomId = random.randbytes(8).hex()
+    if route == "merge":
+        if engine == "simple":
+            sequences = job["videoScript"]
+            sequence_result_paths = [sequence['sequence_result_path'] for sequence in job["videoScript"]]
+            print(f"sequence_result_paths: {sequence_result_paths}")
+            copied_composite_base_directory = f"/tmp/composite-{randomId}/"
+            os.makedirs(copied_composite_base_directory)
+            tmp_output_file = f"/tmp/composite-{randomId}.mp4"
+            for sequence_result_path in sequence_result_paths:
+                shutil.copyfile(sequence_result_path, copied_composite_base_directory + os.path.basename(sequence_result_path))
+
+            simple.simple_composite(copied_composite_base_directory, False, tmp_output_file)
+            shutil.copyfile(tmp_output_file, output_file)
+            print(f"Copied {tmp_output_file} to {output_file}")
+            shutil.rmtree(copied_composite_base_directory)
+            os.remove(tmp_output_file)
+
+            logs = open(logs_file, "r").read()
+
+            returnvalue({
+                "logs": logs,
+                #"composite": "/tmp/merge-" + randomId + ".mp4",
+                "merged": output_file
+            })
+
+
     if route == "composite":
         if engine == "simple":
             randomId = random.randbytes(8).hex()
