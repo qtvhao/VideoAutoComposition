@@ -53,10 +53,13 @@ if __name__ == "__main__":
             copied_composite_base_directory = f"/tmp/composite-{randomId}/"
             os.makedirs(copied_composite_base_directory)
             tmp_output_file = f"/tmp/composite-{randomId}.mp4"
+            copied_composite_files = []
             for sequence_result_path in sequence_result_paths:
-                shutil.copyfile(sequence_result_path, copied_composite_base_directory + os.path.basename(sequence_result_path))
+                copied_composite_file = copied_composite_base_directory + os.path.basename(sequence_result_path)
+                copied_composite_files.append(copied_composite_file)
+                shutil.copyfile(sequence_result_path, copied_composite_file)
 
-            simple.simple_merge(copied_composite_base_directory, tmp_output_file)
+            simple.simple_merge(copied_composite_files, tmp_output_file)
             shutil.copyfile(tmp_output_file, output_file)
             print(f"Copied {tmp_output_file} to {output_file}")
             shutil.rmtree(copied_composite_base_directory)

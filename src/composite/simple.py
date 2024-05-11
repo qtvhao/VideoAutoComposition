@@ -235,17 +235,16 @@ def combine_videos(combined_video_path: str|bool,
 
     return combined_video_path
 
-def simple_merge(image_dir, output_file):
-    print(image_dir)
-    images_files = [f for f in os.listdir(image_dir) if f.endswith('.mp4')]
+def simple_merge(images_files, output_file):
+    #print(images_files)
+     # images_files = [f for f in os.listdir(image_dir) if f.endswith('.mp4')]
     print(images_files)
     clips = []
     for image_file in images_files:
-        clip = moviepy.VideoFileClip(image_dir + image_file)
+        clip = moviepy.VideoFileClip(image_file)
         clips.append(clip)
     final_clip = moviepy.concatenate_videoclips(clips)
     final_clip.write_videofile(filename=output_file,
-                            threads=2,
                             fps=fps,
     )
     print("Done")
