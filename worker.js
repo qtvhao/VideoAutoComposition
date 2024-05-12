@@ -63,6 +63,7 @@ async function mergeToQueue(job) {
           let ancestorsStates = ancestorsJobs.map((job) => {
             return JSON.stringify({
               job: typeof job,
+              is_null: job === null,
               state: job?.state,
             })
           });
@@ -112,7 +113,7 @@ let Processor = (async (job) => {
       if (data.toString().indexOf('%') !== -1) {
         let percentage = data.toString().match(/\d+/)[0];
         if (percentage === progress) {
-          job.log(data.toString());
+          // job.log(data.toString());
           return;
         }
         progress = percentage;
