@@ -12,7 +12,7 @@ import skimage.filters as filters
 
 logs_file = "/tmp/logs.txt"
 output_folder = "/app/assets/outputs/"
-fps = 60
+fps = 1
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
 def log_color_clip(clip):
