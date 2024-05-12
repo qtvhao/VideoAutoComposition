@@ -60,13 +60,23 @@ async function mergeToQueue(job) {
 
         for (let ancestorsQueue of ancestorsQueues) {
           let ancestorsJobs = await Promise.all(missingJobsIds.map((jobId) => ancestorsQueue.getJob(jobId)));
-          let ancestorsStates = ancestorsJobs.map((job) => {
+          /* let ancestorsStates = ancestorsJobs.map((job) => {
             return JSON.stringify({
               job: typeof job,
               is_null: job === null,
               state: job?.state,
             })
-          });
+          }); */
+          let ancestorsStates = []
+          for (let i = 0; i < ancestorsJobs.length; i++) {
+            let job = ancestorsJobs[i];
+            ancestorsStates.push(JSON.stringify({
+              job: typeof job,
+              is_null: job === null,
+              state: await job?.getState(),
+              jobId: missingJobsIds[i],
+            }));
+          }
           job.log('Ancestors states: ' + ancestorsStates.join(', ') + ' for ' + ancestorsQueue.name);
         }
       }
