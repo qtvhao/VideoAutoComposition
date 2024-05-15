@@ -11,7 +11,6 @@ ASSETS_DIR = "/app/assets/"
 SRC_DIR = "/app/src/"
 TEMPLATES_DIR = "/app/templates/"
 
-logs_file = "/tmp/logs.txt"
 # template="Minimalist Line-based Economic News Intro"
 # template_folder = TEMPLATES_DIR + template + "/"
 def returnvalue(returnvalue_0):
@@ -65,10 +64,7 @@ if __name__ == "__main__":
             shutil.rmtree(copied_composite_base_directory)
             os.remove(tmp_output_file)
 
-            logs = open(logs_file, "r").read()
-
             returnvalue({
-                "logs": logs,
                 #"composite": "/tmp/merge-" + randomId + ".mp4",
                 "merged": output_file
             })
@@ -100,10 +96,7 @@ if __name__ == "__main__":
             os.remove(copied_audio_file)
             os.remove(tmp_output_file)
 
-            logs = open(logs_file, "r").read()
-
             returnvalue({
-                "logs": logs,
                 "composite": "/tmp/composite-" + randomId + ".mp4",
                 "caption": output_file
             })
