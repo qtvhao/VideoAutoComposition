@@ -23,7 +23,7 @@ async function mergeToQueue(job) {
     let jobs = await Promise.all(jobIds.map((jobId) => queue.getJob(jobId)));
     let isAllJobsCompleted = jobs.every((job) => job && job.returnvalue);
     console.log('isAllJobsCompleted', isAllJobsCompleted);
-    if (isAllJobsCompleted) {
+    if (isAllJobsCompleted || job.data.compositeEngine === 'merge') {
       let destinateJob = {
         data: {
           ...job.data,
