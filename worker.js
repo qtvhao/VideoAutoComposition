@@ -23,7 +23,7 @@ async function mergeToQueue(job) {
     let jobs = await Promise.all(jobIds.map((jobId) => queue.getJob(jobId)));
     let isAllJobsCompleted = jobs.every((job) => job && job.returnvalue);
     console.log('isAllJobsCompleted', isAllJobsCompleted);
-    if (isAllJobsCompleted || job.data.compositeEngine === 'merge') {
+    if (isAllJobsCompleted) {
       let destinateJob = {
         data: {
           ...job.data,
@@ -172,7 +172,14 @@ let Processor = (async (job) => {
   // console.log('Return value', returnValue);
   console.log('Stdout', stdout);
   console.log('Stderr', stderr);
-  mergeToQueue(job);
+  if (job.data.compositeEngine === 'merge') {
+    await destinateQueue.add({
+      ...job.data,
+      merged: returnValue,
+    });
+  }else{
+    mergeToQueue(job);
+  }
 
   return returnValue;
 });
