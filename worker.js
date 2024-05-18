@@ -103,10 +103,10 @@ let Processor = (async (job) => {
       }else{
         (async function() {
           await new Promise(r => setTimeout(r, 60_000));
-          await job.moveToFailed({
-            message: 'Some jobs are missing',
-          }, true);
-          await new Promise(r => setTimeout(r, 1_000));
+//          await job.moveToFailed({
+//            message: 'Some jobs are missing',
+//          }, true);
+//          await new Promise(r => setTimeout(r, 1_000));
           job = await queue.getJob(job.id);
 //          try{
 //            await job.releaseLock();
@@ -115,7 +115,7 @@ let Processor = (async (job) => {
 //          }
           await job.retry();
         })();
-        throw new Error('Some jobs are missing');
+        throw new Error('Some jobs under ' + job.data.articleId + ' are missing. Retry in 60 seconds. Non-exists jobs: ' + jobIds.filter((_jobId, i) => !jobs[i]).join(', '));
       }
   }
   
