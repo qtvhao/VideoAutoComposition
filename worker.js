@@ -101,19 +101,21 @@ let Processor = (async (job) => {
       if (isAllJobsExists) {
         //break;
       }else{
-        await job.moveToFailed({
-          message: 'Some jobs are missing',
-        }, true);
-        await new Promise(r => setTimeout(r, 1_000));
-        // releaseLock
-        job = await queue.getJob(job.id);
-        try{
-          await job.releaseLock();
-        }catch(e){
-          console.error('Error', e);
-        }
-        await job.retry();
-        return;
+        (async function() {
+          await new Promise(r => setTimeout(r, 60_000));
+          await job.moveToFailed({
+            message: 'Some jobs are missing',
+          }, true);
+          await new Promise(r => setTimeout(r, 1_000));
+          job = await queue.getJob(job.id);
+//          try{
+//            await job.releaseLock();
+//          }catch(e){
+//            console.error('Error', e);
+//          }
+          await job.retry();
+        })();
+        throw new Error('Some jobs are missing');
       }
   }
   
