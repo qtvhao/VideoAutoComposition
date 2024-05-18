@@ -105,6 +105,13 @@ let Processor = (async (job) => {
           message: 'Some jobs are missing',
         }, true);
         await new Promise(r => setTimeout(r, 1_000));
+        // releaseLock
+        job = await queue.getJob(job.id);
+        try{
+          await job.releaseLock();
+        }catch(e){
+          console.error('Error', e);
+        }
         await job.retry();
         return;
       }
