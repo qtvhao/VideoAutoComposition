@@ -92,6 +92,18 @@ let Processor = (async (job) => {
       caption: 'captionPath'
     }
   }
+  if (job.data.compositeEngine !== 'merge') {
+    while(true) {
+      let jobIds = job.data.videoScript.map((videoScript) => videoScript.jobId);
+      let jobs = await Promise.all(jobIds.map((jobId) => queue.getJob(jobId)));
+      let isAllJobsExists = jobs.every(job => job);
+      job.log('isAllJobsExists', isAllJobsExists);
+      if (isAllJobsExists) {
+        break;
+      }
+      await new Promise(r => setTimeout(r, 10_000));
+    }
+  }
   
   console.log('Processing job', job.id);
   // console.log('Job data', job.data);
