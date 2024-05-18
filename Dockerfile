@@ -8,11 +8,13 @@ FROM ghcr.io/qtvhao/pymovie:main
 ENV PYTHONPATH="/app"
 
 # Install system dependencies
-# RUN apt-get update && apt-get install -y \
-#     git \
-#     imagemagick \
-#     ffmpeg \
-#     && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y \
+    imagemagick \
+    ffmpeg \
+    && apt-get clean \
+    && apt-get autoremove -y \
+    && apt-get autoclean -y \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 # python -m venv venv
 COPY requirements.txt ./
 RUN . venv/bin/activate && pip install --no-cache-dir -r requirements.txt
