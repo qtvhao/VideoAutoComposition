@@ -1,8 +1,8 @@
-FROM ghcr.io/qtvhao/debian:main as yarn
-COPY yarn.lock package.json ./
-RUN . venv/bin/activate && . /root/.nvm/nvm.sh && yarn install
+#FROM ghcr.io/qtvhao/debian:main as yarn
+#COPY yarn.lock package.json ./
+#RUN . venv/bin/activate && . /root/.nvm/nvm.sh && yarn install
 
-FROM ghcr.io/qtvhao/debian:main
+FROM ghcr.io/qtvhao/pymovie:main
 
 
 ENV PYTHONPATH="/app"
@@ -17,7 +17,7 @@ ENV PYTHONPATH="/app"
 COPY requirements.txt ./
 RUN . venv/bin/activate && pip install --no-cache-dir -r requirements.txt
 
-COPY --from=yarn /app/node_modules /app/node_modules
+#COPY --from=yarn /app/node_modules /app/node_modules
 
 RUN cat /etc/ImageMagick-6/policy.xml | sed 's/none/read,write/g'> /etc/ImageMagick-6/policy.xml
 
