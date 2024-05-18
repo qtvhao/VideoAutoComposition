@@ -58,6 +58,12 @@ if __name__ == "__main__":
                 copied_composite_files.append(copied_composite_file)
                 shutil.copyfile(sequence_result_path, copied_composite_file)
 
+#            is_sequence_exists = output_file exists
+            if os.path.exists(output_file):
+                print(f"output_file exists: {output_file}")
+                returnvalue({
+                    "merged": output_file
+                })
             simple.simple_merge(copied_composite_files, tmp_output_file)
             shutil.copyfile(tmp_output_file, output_file)
             print(f"Copied {tmp_output_file} to {output_file}")
