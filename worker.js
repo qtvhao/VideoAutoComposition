@@ -179,9 +179,10 @@ let Processor = (async (job) => {
   if (job.data.compositeEngine === 'merge') {
     await destinateQueue.add({
       ...job.data,
+      merged: returnValue,
+    }, {
       lockDuration: 60_000, // lock duration is used to prevent the job from being processed by multiple workers
       maxStalledCount: 0,
-      merged: returnValue,
     });
   }else{
     mergeToQueue(job);
