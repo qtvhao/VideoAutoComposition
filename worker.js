@@ -60,13 +60,6 @@ async function mergeToQueue(job) {
 
         for (let ancestorsQueue of ancestorsQueues) {
           let ancestorsJobs = await Promise.all(missingJobsIds.map((jobId) => ancestorsQueue.getJob(jobId)));
-          /* let ancestorsStates = ancestorsJobs.map((job) => {
-            return JSON.stringify({
-              job: typeof job,
-              is_null: job === null,
-              state: job?.state,
-            })
-          }); */
           let ancestorsStates = []
           for (let i = 0; i < ancestorsJobs.length; i++) {
             let job = ancestorsJobs[i];
@@ -93,7 +86,6 @@ let Processor = (async (job) => {
     }
   }
   if (job.data.compositeEngine !== 'merge') {
-    //while(true) {
       let jobIds = job.data.videoScript.map((videoScript) => videoScript.jobId);
       let jobs = await Promise.all(jobIds.map((jobId) => queue.getJob(jobId)));
       let isAllJobsExists = jobs.every(job => job);
@@ -101,26 +93,33 @@ let Processor = (async (job) => {
       if (isAllJobsExists) {
         //break;
       }else{
+        let missingJobsIds = jobIds.filter((_jobId, i) => !jobs[i]);
+        let addedLogs = [];
+        for (let ancestorsQueue of ancestorsQueues) {
+          let ancestorsJobs = await Promise.all(missingJobsIds.map((jobId) => ancestorsQueue.getJob(jobId)));
+          let ancestorsStates = []
+          for (let i = 0; i < ancestorsJobs.length; i++) {
+            let job = ancestorsJobs[i];
+            ancestorsStates.push(JSON.stringify({
+              job: typeof job,
+              is_null: job === null,
+              state: await job?.getState(),
+              jobId: missingJobsIds[i],
+            }));
+          }
+          addedLogs.push('Ancestors states: ' + ancestorsStates.join(', ') + ' for ' + ancestorsQueue.name);
+        }
         (async function() {
           await new Promise(r => setTimeout(r, 60_000));
-//          await job.moveToFailed({
-//            message: 'Some jobs are missing',
-//          }, true);
-//          await new Promise(r => setTimeout(r, 1_000));
           job = await queue.getJob(job.id);
-//          try{
-//            await job.releaseLock();
-//          }catch(e){
-//            console.error('Error', e);
-//          }
           await job.retry();
         })();
-        throw new Error('Some jobs under ' + job.data.articleId + ' are missing. Retry in 60 seconds. Non-exists jobs: ' + jobIds.filter((_jobId, i) => !jobs[i]).join(', '));
+        throw new Error('Some jobs under ' + job.data.articleId + ' are missing. Retry in 60 seconds. Non-exists jobs: ' + missingJobsIds.join(', ') + '. Ancestors states: ' + addedLogs.join(', '));
       }
   }
   
   console.log('Processing job', job.id);
-  // console.log('Job data', job.data);
+
   let jobJson = '/tmp/job-' + job.id + '.json'
   fs.writeFileSync(jobJson, JSON.stringify(job.data));
   let compositeEngine = job.data.compositeEngine ?? 'composite';
@@ -145,11 +144,9 @@ let Processor = (async (job) => {
     let progress = 0
     process.stderr.on('data', (data) => {
       stderr += data.toString();
-//      console.log(data.toString());
       if (data.toString().indexOf('%') !== -1) {
         let percentage = data.toString().match(/\d+/)[0];
         if (percentage === progress) {
-          // job.log(data.toString());
           return;
         }
         progress = percentage;
@@ -171,7 +168,6 @@ let Processor = (async (job) => {
   });
   //
   let returnValue = JSON.parse(fs.readFileSync('/tmp/returnvalue.json'));
-  // console.log('Return value', returnValue);
   console.log('Stdout', stdout);
   console.log('Stderr', stderr);
   if (job.data.compositeEngine === 'merge') {
