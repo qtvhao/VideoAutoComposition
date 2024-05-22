@@ -95,7 +95,11 @@ let Processor = (async (job) => {
         let existsJobs = jobs.filter(job => job);
         for (let existsJob of existsJobs) {
             if (await existsJob.getState() === 'failed') {
-                await existsJob.retry();
+                try{
+                  await existsJob.retry();
+                }catch(e){
+                  job.log('Failed to retry job ' + existsJob.id + ' with error ' + e.message);
+                }
             }
         }
       }else{
