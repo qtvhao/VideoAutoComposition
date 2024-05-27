@@ -90,6 +90,7 @@ let Processor = (async (job) => {
       let jobs = await Promise.all(jobIds.map((jobId) => queue.getJob(jobId)));
       let isAllJobsExists = jobs.every(job => job);
       job.log('isAllJobsExists: ' + isAllJobsExists + '. Non-exists jobs: ' + jobIds.filter((jobId, i) => !jobs[i]).join(', '));
+      let attemptsMade = job.attemptsMade;
       if (isAllJobsExists) {
         //break;
         let existsJobs = jobs.filter(job => job);
@@ -119,12 +120,7 @@ let Processor = (async (job) => {
           }
           addedLogs.push('Ancestors states: ' + ancestorsStates.join(', ') + ' for ' + ancestorsQueue.name);
         }
- //       (async function() {
-//          await new Promise(r => setTimeout(r, 60_000));
-//          job = await queue.getJob(job.id);
-//          await job.retry();
-//        })();
-        throw new Error('Some jobs under ' + job.data.articleId + ' are missing. Retry in 60 seconds. Non-exists jobs: ' + missingJobsIds.join(', ') + '. Ancestors states: ' + addedLogs.join(', '));
+        throw new Error('Attempts made ' + attemptsMade + '. Some jobs under ' + job.data.articleId + ' are missing. Retry in 60 seconds. Non-exists jobs: ' + missingJobsIds.join(', ') + '. Ancestors states: ' + addedLogs.join(', '));
       }
   }
   
