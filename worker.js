@@ -166,7 +166,9 @@ let Processor = (async (job) => {
     process.on('close', (code) => {
       if (code !== 0) {
         console.error(`child process exited with code ${code}`);
-        return reject(stderr);
+        return setTimeout(() => {
+          return reject(stderr);
+        }, 10_000);
       }
       console.log(`child process exited with code ${code}`);
       resolve(stdout);
