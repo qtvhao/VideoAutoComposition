@@ -118,6 +118,12 @@ let Processor = (async (job) => {
               jobId: missingJobsIds[i],
             }));
           }
+          let ancestorsStatesAllCompleted = ancestorsStates.every((state) => JSON.parse(state).state === 'completed');
+          if (ancestorsStatesAllCompleted) {
+            ancestorsStates = [
+              "All completed"
+            ]
+          }
           addedLogs.push('Ancestors states: ' + ancestorsStates.join(', ') + ' for ' + ancestorsQueue.name);
         }
         throw new Error('Attempts made ' + attemptsMade + '. Some jobs under ' + job.data.articleId + ' are missing. Retry in 60 seconds. Non-exists jobs: ' + missingJobsIds.join(', ') + '. Ancestors states: ' + addedLogs.join(', '));
