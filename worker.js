@@ -76,6 +76,28 @@ async function mergeToQueue(job) {
     }
   }
 }
+async function throwsIfAudioFileError(audioFilePath) {
+  // if ffmpeg probe fails, throw error
+  let stdout = '';
+  let stderr = '';
+  await new Promise((resolve, reject) => {
+    let process = spawn('ffprobe', ['-i', audioFilePath]);
+    process.stdout.on('data', (data) => {
+      stdout += data.toString();
+    });
+    process.stderr.on('data', (data) => {
+      stderr += data.toString();
+    });
+    process.on('close', (code) => {
+      if (code !== 0) {
+        console.error(`child process exited with code ${code}`);
+        return reject(stderr);
+      }
+      console.log(`child process exited with code ${code}`);
+      resolve(stdout);
+    });
+  });
+}
 let Processor = (async (job) => {
   console.log('Processing job', job.id);
   if (process.env.DEBUG && 0) {
@@ -133,6 +155,7 @@ let Processor = (async (job) => {
   console.log('Processing job', job.id);
 
   let jobJson = '/tmp/job-' + job.id + '.json'
+  await throwsIfAudioFileError(job.data.videoScript[job.data.numberthOfParagraph].audioFilePath);
   fs.writeFileSync(jobJson, JSON.stringify(job.data));
   let compositeEngine = job.data.compositeEngine ?? 'composite';
   if (compositeEngine) {
