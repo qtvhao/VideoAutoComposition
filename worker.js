@@ -99,6 +99,8 @@ async function throwsIfAudioFileError(audioFilePath) {
   });
 }
 let Processor = (async (job) => {
+  let countCompletedJobs = await queue.getCompletedCount();
+  console.log('Successfully merged: ', countCompletedJobs);
   console.log('Processing job', job.id);
   if (process.env.DEBUG && 0) {
     await new Promise(r => setTimeout(r, Math.random() * 2_000));
@@ -185,7 +187,6 @@ let Processor = (async (job) => {
           return;
         }
         progress = percentage;
-        console.log('Progress', percentage);
         job.progress(Number(percentage));
       }else{
         job.log(data.toString());
@@ -195,6 +196,7 @@ let Processor = (async (job) => {
     process.on('close', (code) => {
       if (code !== 0) {
         console.error(`child process exited with code ${code}`);
+        console.log('Stderr', stderr);
         return setTimeout(() => {
           return reject(stderr);
         }, 10_000);
@@ -218,6 +220,7 @@ let Processor = (async (job) => {
   }else{
     mergeToQueue(job);
   }
+  console.log("On queue", queue.name, "job", job.id, "completed with return value", returnValue);
 
   return returnValue;
 });
