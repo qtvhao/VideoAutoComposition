@@ -118,7 +118,9 @@ let Processor = (async (job) => {
       let jobIds = job.data.videoScript.map((videoScript) => videoScript.jobId);
       let jobs = await Promise.all(jobIds.map((jobId) => queue.getJob(jobId)));
       let isAllJobsExists = jobs.every(job => job);
-      job.log('isAllJobsExists: ' + isAllJobsExists + '. Non-exists jobs: ' + jobIds.filter((jobId, i) => !jobs[i]).join(', '));
+      if (!isAllJobsExists) {
+        job.log('isAllJobsExists: ' + isAllJobsExists + '. Non-exists jobs: ' + jobIds.filter((jobId, i) => !jobs[i]).join(', '));
+      }
       let attemptsMade = job.attemptsMade;
       if (isAllJobsExists) {
         //break;
