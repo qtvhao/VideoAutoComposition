@@ -1,6 +1,7 @@
 let Queue = require('bull');
 let fs = require('fs');
 let { spawn } = require('child_process');
+const path = require('path');
 console.log('Worker started');
 let queueName = process.env.QUEUE_NAME || 'video-auto-composition';
 let destinateQueueName = process.env.DESTINATE_QUEUE || 'video-auto-composition-result';
@@ -98,6 +99,10 @@ async function throwsIfAudioFileError(audioFilePath) {
     });
   });
 }
+let cacheFolder = '/app/storage/images/video-auto-composition-cached';
+if (!fs.existsSync(cacheFolder)) {
+  fs.mkdirSync(cacheFolder, { recursive: true });
+}
 let Processor = (async (job) => {
   let countCompletedJobs = await queue.getCompletedCount();
   console.log('Successfully merged: ', countCompletedJobs);
@@ -171,44 +176,58 @@ let Processor = (async (job) => {
   let stdout = '';
   let stderr = '';
   await job.log(`python3 ${script} composite ${jobJson}`);
-  await new Promise((resolve, reject) => {
-    let process = spawn('python3', [script, compositeEngine, jobJson]);
-    process.stdout.on('data', (data) => {
-      stdout += data.toString();
-      job.log(data.toString());
-      console.log(data.toString());
-    });
-    let progress = 0
-    process.stderr.on('data', (data) => {
-      stderr += data.toString();
-      if (data.toString().indexOf('%') !== -1) {
-        let percentage = data.toString().match(/\d+/)[0];
-        if (percentage === progress) {
-          return;
-        }
-        progress = percentage;
-        job.progress(Number(percentage));
-      }else{
+  let articleName = job.data.article.name;
+  let articleId = job.data.articleId;
+  let numberthOfParagraph = job.data.numberthOfParagraph;
+  let cacheKey = articleName + "_" + articleId + "_" + numberthOfParagraph;
+  if (job.data.compositeEngine === 'merge') {
+    cacheKey = articleName + "_" + articleId + "_merged";
+  }
+  let returnValue;
+  let returnValueInCacheFile = path.join(cacheFolder, cacheKey + '.json');
+  if (!fs.existsSync(returnValueInCacheFile)) {
+    await new Promise((resolve, reject) => {
+      let process = spawn('python3', [script, compositeEngine, jobJson]);
+      process.stdout.on('data', (data) => {
+        stdout += data.toString();
         job.log(data.toString());
-        console.error(`stderr: ${data}`);
-      }
+        console.log(data.toString());
+      });
+      let progress = 0
+      process.stderr.on('data', (data) => {
+        stderr += data.toString();
+        if (data.toString().indexOf('%') !== -1) {
+          let percentage = data.toString().match(/\d+/)[0];
+          if (percentage === progress) {
+            return;
+          }
+          progress = percentage;
+          job.progress(Number(percentage));
+        }else{
+          job.log(data.toString());
+          console.error(`stderr: ${data}`);
+        }
+      });
+      process.on('close', (code) => {
+        if (code !== 0) {
+          console.error(`child process exited with code ${code}`);
+          console.log('Stderr', stderr);
+          return setTimeout(() => {
+            return reject(stderr);
+          }, 10_000);
+        }
+        console.log(`child process exited with code ${code}`);
+        resolve(stdout);
+      });
     });
-    process.on('close', (code) => {
-      if (code !== 0) {
-        console.error(`child process exited with code ${code}`);
-        console.log('Stderr', stderr);
-        return setTimeout(() => {
-          return reject(stderr);
-        }, 10_000);
-      }
-      console.log(`child process exited with code ${code}`);
-      resolve(stdout);
-    });
-  });
-  //
-  let returnValue = JSON.parse(fs.readFileSync('/tmp/returnvalue.json'));
-  console.log('Stdout', stdout);
-  console.log('Stderr', stderr);
+    //
+    returnValue = JSON.parse(fs.readFileSync('/tmp/returnvalue.json'));
+    fs.writeFileSync(returnValueInCacheFile, JSON.stringify(returnValue));
+    console.log('Stdout', stdout);
+    console.log('Stderr', stderr);
+  }else{
+    returnValue = JSON.parse(fs.readFileSync(returnValueInCacheFile));
+  }
   if (job.data.compositeEngine === 'merge') {
     await destinateQueue.add({
       ...job.data,
