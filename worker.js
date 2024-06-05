@@ -179,7 +179,7 @@ let Processor = (async (job) => {
   let articleName = job.data.article.name;
   let articleId = job.data.articleId;
   let numberthOfParagraph = job.data.numberthOfParagraph;
-  let cacheKey = articleName + "_" + articleId + "_" + numberthOfParagraph;
+  let cacheKey = articleName + "_" + articleId + "_" + (numberthOfParagraph + 1) + "-out-of-" + (job.data.videoScript.length);
   if (job.data.compositeEngine === 'merge') {
     cacheKey = articleName + "_" + articleId + "_merged";
   }
