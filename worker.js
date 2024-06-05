@@ -157,6 +157,7 @@ let Processor = (async (job) => {
           }
           addedLogs.push('Ancestors states: ' + ancestorsStates.join(', ') + ' for ' + ancestorsQueue.name);
         }
+        await new Promise(r => setTimeout(r, 6_000));
         let msg = `Attempts made ${attemptsMade}. Some jobs under ${job.data.articleId} are missing. Retry in 60 seconds. Non-exists jobs: ${missingJobsIds.join(', ')}. Ancestors states: ${addedLogs.join(', ')}`;
         job.log(msg);
         throw new Error(msg);
