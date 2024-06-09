@@ -245,6 +245,22 @@ let Processor = (async (job) => {
     mergeToQueue(job);
   }
   console.log("On queue", queue.name, "job", job.id, "completed with return value", returnValue);
+  if (job.data.compositeEngine !== 'merge') {
+    let jobIds = job.data.videoScript.map((videoScript) => videoScript.jobId);
+    let jobs = await Promise.all(jobIds.map((jobId) => queue.getJob(jobId)));
+    let existsJobs = jobs.filter(job => job);
+    for (let existsJob of existsJobs) {
+      if (await existsJob.getState() === 'failed') {
+        console.log('After processing job', job.id, '. Found failed job that needs to be retried ', existsJob.id);
+        job.log('After processing job ' + job.id + '. Found failed job that needs to be retried ' + existsJob.id);
+        try {
+          await existsJob.retry();
+        } catch (e) {
+          job.log('Failed to retry job ' + existsJob.id + ' with error ' + e.message);
+        }
+      }
+    }
+  }
 
   return returnValue;
 });
