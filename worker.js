@@ -13,7 +13,10 @@ let opts = {
   }
 };
 let queue = new Queue(queueName, opts);
-let destinateQueue = new Queue(destinateQueueName, opts);
+let destinateQueues = destinateQueueName.split(';').map((queueName) => new Queue(queueName, opts))
+async function getDestinateQueue () {
+  return destinateQueues[Math.floor(Math.random() * destinateQueues.length)];
+}
 let ancestorsQueues = (process.env.ANCESTORS_QUEUES || '').split(';').map((queueName) => new Queue(queueName, opts))
 
 async function mergeToQueue(job) {
@@ -41,6 +44,7 @@ async function mergeToQueue(job) {
           jobId: jobIds.reduce((acc, jobId) => acc + Number(jobId), 0),
         }
       };
+      let destinateQueue = await getDestinateQueue();
       if (!await destinateQueue.getJob(destinateJob.opts.jobId)) {
         console.log('Adding destinate job')
         await destinateQueue.add(destinateJob.data, {
@@ -124,7 +128,7 @@ let Processor = (async (job) => {
       let attemptsMade = job.attemptsMade;
       if (isAllJobsExists) {
         //break;
-        let existsJobs = jobs.filter(job => job);
+        /* let existsJobs = jobs.filter(job => job);
         for (let existsJob of existsJobs) {
             if (await existsJob.getState() === 'failed') {
                 try{
@@ -133,7 +137,7 @@ let Processor = (async (job) => {
                   job.log('Failed to retry job ' + existsJob.id + ' with error ' + e.message);
                 }
             }
-        }
+        } */
       }else{
         let missingJobsIds = jobIds.filter((_jobId, i) => !jobs[i]);
         let addedLogs = [];
@@ -234,6 +238,7 @@ let Processor = (async (job) => {
     returnValue = JSON.parse(fs.readFileSync(returnValueInCacheFile));
   }
   if (job.data.compositeEngine === 'merge') {
+    let destinateQueue = await getDestinateQueue();
     await destinateQueue.add({
       ...job.data,
       merged: returnValue,
