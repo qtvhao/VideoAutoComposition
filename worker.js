@@ -240,6 +240,7 @@ let Processor = (async (job) => {
   if (job.data.compositeEngine === 'merge') {
     let destinateQueue = await getDestinateQueue();
     console.log('Adding destinate job to', destinateQueue.name);
+    job.log('Adding destinate job to ' + destinateQueue.name);
     await destinateQueue.add({
       ...job.data,
       merged: returnValue,
