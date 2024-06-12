@@ -175,7 +175,7 @@ let Processor = (async (job) => {
   fs.writeFileSync(jobJson, JSON.stringify(job.data));
   let compositeEngine = job.data.compositeEngine ?? 'composite';
   if (compositeEngine) {
-    console.log('Composite engine', compositeEngine);
+    console.log('Composite 2 engine', compositeEngine);
   }
   if (fs.existsSync('/tmp/returnvalue.json')) {
     fs.unlinkSync('/tmp/returnvalue.json');
@@ -238,6 +238,7 @@ let Processor = (async (job) => {
     returnValue = JSON.parse(fs.readFileSync(returnValueInCacheFile));
   }
   if (job.data.compositeEngine === 'merge') {
+    console.log('Merged job', job.id, 'completed with return value', returnValue);
     let destinateQueue = await getDestinateQueue();
     console.log('Adding destinate job to', destinateQueue.name);
     job.log('Adding destinate job to ' + destinateQueue.name);
@@ -249,6 +250,7 @@ let Processor = (async (job) => {
       maxStalledCount: 0,
     });
   }else{
+    console.log('L213: Adding to queue');
     mergeToQueue(job);
   }
   console.log("On queue", queue.name, "job", job.id, "completed with return value", returnValue);
