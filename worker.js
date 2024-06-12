@@ -188,9 +188,9 @@ let Processor = (async (job) => {
   let articleName = job.data.article.name;
   let articleId = job.data.articleId;
   let numberthOfParagraph = job.data.numberthOfParagraph;
-  let cacheKey = articleName + "_" + articleId + "_" + (numberthOfParagraph + 1) + "-out-of-" + (job.data.videoScript.length);
+  let cacheKey = `${articleName}_${articleId}_${numberthOfParagraph + 1}-out-of-${job.data.videoScript.length}`;
   if (job.data.compositeEngine === 'merge') {
-    cacheKey = articleName + "_" + articleId + "_merged";
+    cacheKey = `${articleName}_${articleId}_merged`;
   }
   let returnValue;
   let returnValueInCacheFile = path.join(cacheFolder, cacheKey + '.json');
@@ -239,6 +239,7 @@ let Processor = (async (job) => {
   }
   if (job.data.compositeEngine === 'merge') {
     let destinateQueue = await getDestinateQueue();
+    console.log('Adding destinate job to', destinateQueue.name);
     await destinateQueue.add({
       ...job.data,
       merged: returnValue,
