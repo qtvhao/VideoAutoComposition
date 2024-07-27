@@ -25,3 +25,4 @@ RUN cat /etc/ImageMagick-6/policy.xml | sed 's/none/read,write/g'> /etc/ImageMag
 
 COPY *.py *.js *.json ./
 COPY src src
+RUN . venv/bin/activate && python3 test.py
