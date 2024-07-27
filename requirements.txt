@@ -10,6 +10,7 @@ moviepy~=2.0.0.dev2
 # loguru~=0.7.2
 # aiohttp~=3.9.3
 # urllib3~=2.2.1
+numpy<2
 pillow~=10.3.0
 # pydantic~=2.6.3
 # g4f~=0.3.0.4
