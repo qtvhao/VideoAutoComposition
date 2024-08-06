@@ -46,7 +46,14 @@ async function mergeToQueue(job) {
       };
       let destinateQueue = await getDestinateQueue();
       if (!await destinateQueue.getJob(destinateJob.opts.jobId)) {
-        console.log('Adding destinate job')
+        console.log('Adding destinate job'); //
+        destinateJob.data.videoScript = destinateJob.data.videoScript.map((paragraph) => {
+          if (paragraph.subtitle) {
+            delete paragraph.subtitle;
+          }
+
+          return paragraph;
+        });
         await destinateQueue.add(destinateJob.data, {
           jobId: destinateJob.opts.jobId,
         });
@@ -242,6 +249,14 @@ let Processor = (async (job) => {
     let destinateQueue = await getDestinateQueue();
     console.log('Adding destinate job to', destinateQueue.name);
     job.log('Adding destinate job to ' + destinateQueue.name);
+    job.data.videoScript = job.data.videoScript.map((paragraph) => {
+      if (paragraph.subtitle) {
+        delete paragraph.subtitle;
+      }
+
+      return paragraph;
+    });
+
     await destinateQueue.add({
       ...job.data,
       merged: returnValue,
