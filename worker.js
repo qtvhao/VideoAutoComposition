@@ -54,6 +54,7 @@ async function mergeToQueue(job) {
 
           return paragraph;
         });
+        destinateJob.data.searchPhrasesAlphaNumeric = destinateJob.data.videoScript.map((videoScript) => videoScript.searchPhraseAlphaNumeric);
         await destinateQueue.add(destinateJob.data, {
           jobId: destinateJob.opts.jobId,
         });
