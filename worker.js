@@ -251,7 +251,7 @@ let Processor = (async (job) => {
     job.log('Adding destinate job to ' + destinateQueue.name);
     job.data.videoScript = job.data.videoScript.map((paragraph) => {
       if (paragraph.subtitle) {
-        delete paragraph.subtitle;
+        //delete paragraph.subtitle;
       }
 
       return paragraph;
