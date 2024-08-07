@@ -37,6 +37,7 @@ async function mergeToQueue(job) {
             return {
               ...videoScript,
               sequence_result_path: job.returnvalue.caption,
+              searchPhrasesAlphaNumeric: job.data.searchPhrasesAlphaNumeric,
             };
           }),
         },
