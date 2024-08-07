@@ -27,7 +27,8 @@ if __name__ == "__main__":
     job = json.loads(job_json)
     numberthOfParagraph = job["numberthOfParagraph"]
     paragraph = job["videoScript"][numberthOfParagraph]
-    subtitle = paragraph["subtitle"]
+    if "subtitle" in paragraph: # if paragraph has subtitle, set it to subtitle
+        subtitle = paragraph["subtitle"]
     sanitizedBaseDirectory = paragraph["sanitizedBaseDirectory"] + "/"
     audio_file = paragraph["audioFilePath"]
     engine = "simple"
