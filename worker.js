@@ -49,7 +49,7 @@ async function mergeToQueue(job) {
         console.log('Adding destinate job'); //
         destinateJob.data.videoScript = destinateJob.data.videoScript.map((paragraph) => {
           if (paragraph.subtitle) {
-            // delete paragraph.subtitle;
+            delete paragraph.subtitle;
           }
 
           return paragraph;
