@@ -36,8 +36,9 @@ async function mergeToQueue(job) {
             let job = jobs.find((job) => job.id === videoScript.jobId);
             let jobData = job.data;
             let numberthOfParagraph = jobData.numberthOfParagraph;
-            if (typeof  job.data.videoScript[numberthOfParagraph].searchPhrasesAlphaNumeric === 'undefined') {
-              console.log('searchPhrasesAlphaNumeric is undefined', job.data.videoScript);
+            if (typeof job.data.videoScript[numberthOfParagraph].searchPhrasesAlphaNumeric === 'undefined') {
+              console.log("numberthOfParagraph: ", numberthOfParagraph);
+              console.log('searchPhrasesAlphaNumeric is undefined', job.data.videoScript[numberthOfParagraph]);
               throw new Error('searchPhrasesAlphaNumeric is undefined');
             }
             return {
