@@ -34,10 +34,16 @@ async function mergeToQueue(job) {
           compositeEngine: 'merge',
           videoScript: job.data.videoScript.map((videoScript) => {
             let job = jobs.find((job) => job.id === videoScript.jobId);
+            let jobData = job.data;
+            let numberthOfParagraph = jobData.numberthOfParagraph;
+            if (typeof  job.data.videoScript[numberthOfParagraph].searchPhrasesAlphaNumeric === 'undefined') {
+              console.log('searchPhrasesAlphaNumeric is undefined', job.data.videoScript);
+              throw new Error('searchPhrasesAlphaNumeric is undefined');
+            }
             return {
               ...videoScript,
               sequence_result_path: job.returnvalue.caption,
-              searchPhrasesAlphaNumeric: job.data.searchPhrasesAlphaNumeric,
+              searchPhrasesAlphaNumeric: job.data.videoScript[numberthOfParagraph].searchPhrasesAlphaNumeric,
             };
           }),
         },
