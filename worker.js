@@ -44,7 +44,7 @@ async function mergeToQueue(job) {
             return {
               ...videoScript,
               sequence_result_path: job.returnvalue.caption,
-              searchPhrasesAlphaNumeric: job.data.videoScript[numberthOfParagraph].searchPhraseAlphaNumeric,
+              searchPhraseAlphaNumeric: job.data.videoScript[numberthOfParagraph].searchPhraseAlphaNumeric,
             };
           }),
         },
