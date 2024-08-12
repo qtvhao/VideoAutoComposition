@@ -22,7 +22,7 @@ if (destinateQueueName.indexOf(';') === -1) {
   destinateQueues = destinateQueueName.split(';').map((queueName) => new Queue(queueName, opts))
 }
 async function getDestinateQueue (job) {
-  if (job && destinateQueueName.indexOf(';') !== -1) {
+  if (job && destinateQueueName.indexOf(' | ') !== -1) {
     console.log('Job data', job.data);
     let article = job.data.article;
     let ancestors = article.ancestors;
@@ -30,6 +30,7 @@ async function getDestinateQueue (job) {
     console.log('Ancestor', ancestor);
     //
     let destinateQueueIndex = destinateQueueName.split(';').findIndex((queueName) => queueName.split(' | ')[0] === ancestor);
+    job.log("Ancestor: " + ancestor + " for queue index " + destinateQueueIndex);
     if (destinateQueueIndex === -1) {
       throw new Error('Ancestor not found');
     }
