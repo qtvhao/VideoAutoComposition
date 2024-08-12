@@ -14,7 +14,24 @@ let opts = {
 };
 let queue = new Queue(queueName, opts);
 let destinateQueues = destinateQueueName.split(';').map((queueName) => new Queue(queueName, opts))
-async function getDestinateQueue () {
+async function getDestinateQueue (job) {
+  // DevOps | qtvhao@gmail.com | youtube devops-qtvha
+  if (job) {
+    console.log('Job data', job.data);
+  }
+  if (destinateQueues[0].indexOf(' | ') > -1) {
+    let article = job.data.article;
+    let ancestors = article.ancestors;
+    let ancestor = ancestors[0];
+    console.log('Ancestor', ancestor);
+    //
+    let destinateQueue = destinateQueues.find((queue) => queue.split(' | ')[0] === ancestor);
+    if (!destinateQueue) {
+      throw new Error('Destinate queue not found for ' + JSON.stringify(ancestor) + '. Available queues are ' + destinateQueues.map((queue) => JSON.stringify(queue.split(' | ')[0])).join(', '));
+    }
+    return destinateQueue;
+  }
+
   return destinateQueues[Math.floor(Math.random() * destinateQueues.length)];
 }
 let ancestorsQueues = (process.env.ANCESTORS_QUEUES || '').split(';').map((queueName) => new Queue(queueName, opts))
@@ -255,7 +272,7 @@ let Processor = (async (job) => {
   }
   if (job.data.compositeEngine === 'merge') {
     console.log('Merged job', job.id, 'completed with return value', returnValue);
-    let destinateQueue = await getDestinateQueue();
+    let destinateQueue = await getDestinateQueue(job);
     console.log('Adding destinate job to', destinateQueue.name);
     job.log('Adding destinate job to ' + destinateQueue.name);
     job.data.videoScript = job.data.videoScript.map((paragraph) => {
