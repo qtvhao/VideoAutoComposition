@@ -22,7 +22,7 @@ if (destinateQueueName.indexOf(';') === -1) {
   destinateQueues = destinateQueueName.split(';').map((queueName) => new Queue(queueName, opts))
 }
 async function getDestinateQueue (job) {
-  if (job) {
+  if (job && destinateQueueName.indexOf(';') !== -1) {
     console.log('Job data', job.data);
     let article = job.data.article;
     let ancestors = article.ancestors;
