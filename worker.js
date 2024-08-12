@@ -13,23 +13,27 @@ let opts = {
   }
 };
 let queue = new Queue(queueName, opts);
-let destinateQueues = destinateQueueName.split(';').map((queueName) => new Queue(queueName, opts))
+let destinateQueues
+if (destinateQueueName.indexOf(';') === -1) {
+  destinateQueues = [
+    new Queue(destinateQueueName, opts)
+  ];
+}else{
+  destinateQueues = destinateQueueName.split(';').map((queueName) => new Queue(queueName, opts))
+}
 async function getDestinateQueue (job) {
-  // DevOps | qtvhao@gmail.com | youtube devops-qtvha
   if (job) {
     console.log('Job data', job.data);
-  }
-  if (destinateQueues[0].indexOf(' | ') > -1) {
     let article = job.data.article;
     let ancestors = article.ancestors;
     let ancestor = ancestors[0];
     console.log('Ancestor', ancestor);
     //
-    let destinateQueue = destinateQueues.find((queue) => queue.split(' | ')[0] === ancestor);
-    if (!destinateQueue) {
-      throw new Error('Destinate queue not found for ' + JSON.stringify(ancestor) + '. Available queues are ' + destinateQueues.map((queue) => JSON.stringify(queue.split(' | ')[0])).join(', '));
+    let destinateQueueIndex = destinateQueueName.split(';').findIndex((queueName) => queueName.split(' | ')[0] === ancestor);
+    if (destinateQueueIndex === -1) {
+      throw new Error('Ancestor not found');
     }
-    return destinateQueue;
+    return destinateQueues[destinateQueueIndex];
   }
 
   return destinateQueues[Math.floor(Math.random() * destinateQueues.length)];
@@ -141,6 +145,9 @@ if (!fs.existsSync(cacheFolder)) {
   fs.mkdirSync(cacheFolder, { recursive: true });
 }
 let Processor = (async (job) => {
+  if (job.data.compositeEngine === 'merge') {
+    getDestinateQueue(job);
+  }
   let countCompletedJobs = await queue.getCompletedCount();
   console.log('Successfully merged: ', countCompletedJobs);
   console.log('Processing job', job.id);
