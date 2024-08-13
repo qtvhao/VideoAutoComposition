@@ -20,7 +20,7 @@ if (destinateQueueName.indexOf(' | ') === -1) {
   ];
 }else{
   destinateQueues = destinateQueueName.split(';').map((queueName) => {
-    return new Queue(queueName.split(' | ')[2], opts);
+    return new Queue(queueName.split(' | ')[3], opts);
   })
 }
 async function getDestinateQueue (job) {
