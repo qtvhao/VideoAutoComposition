@@ -14,7 +14,7 @@ let opts = {
 };
 let queue = new Queue(queueName, opts);
 let destinateQueues
-if (destinateQueueName.indexOf(';') === -1) {
+if (destinateQueueName.indexOf(' | ') === -1) {
   destinateQueues = [
     new Queue(destinateQueueName, opts)
   ];
