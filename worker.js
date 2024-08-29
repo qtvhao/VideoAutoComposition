@@ -148,7 +148,6 @@ if (!fs.existsSync(cacheFolder)) {
   fs.mkdirSync(cacheFolder, { recursive: true });
 }
 async function retryJobIds(job, jobIds) {
-  let jobIds = job.data.videoScript.map((videoScript) => videoScript.jobId);
   let jobs = await Promise.all(jobIds.map((jobId) => queue.getJob(jobId)));
   let existsJobs = jobs.filter(job => job);
   for (let existsJob of existsJobs) {
@@ -323,6 +322,7 @@ let Processor = (async (job) => {
   }
   console.log("On queue", queue.name, "job", job.id, "completed with return value", returnValue);
   if (job.data.compositeEngine !== 'merge') {
+    let jobIds = job.data.videoScript.map((videoScript) => videoScript.jobId);
     await retryJobIds(job, jobIds)
   }
 
