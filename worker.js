@@ -196,7 +196,7 @@ let Processor = (async (job) => {
                 }
             }
         } */
-       await retryJobIds(job, jobIds);
+      //  await retryJobIds(job, jobIds);
       }else{
         let missingJobsIds = jobIds.filter((_jobId, i) => !jobs[i]);
         let addedLogs = [];
