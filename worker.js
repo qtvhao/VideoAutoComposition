@@ -127,28 +127,10 @@ async function mergeToQueue(job) {
     }
   }
 }
-async function throwsIfAudioFileError(audioFilePath) {
-  // if ffmpeg probe fails, throw error
-  let stdout = '';
-  let stderr = '';
-  await new Promise((resolve, reject) => {
-    let process = spawn('ffprobe', ['-i', audioFilePath]);
-    process.stdout.on('data', (data) => {
-      stdout += data.toString();
-    });
-    process.stderr.on('data', (data) => {
-      stderr += data.toString();
-    });
-    process.on('close', (code) => {
-      if (code !== 0) {
-        console.error(`child process exited with code ${code}`);
-        return reject(`child process exited with code ${code}. Stderr: ${stderr} ${stdout}`);
-      }
-      console.log(`child process exited with code ${code}`);
-      resolve(stdout);
-    });
-  });
-}
+// async function throwsIfAudioFileError(audioFilePath) {
+//   // if ffmpeg probe fails, throw error
+  
+// }
 let cacheFolder = '/app/storage/images/video-auto-composition-cached';
 if (!fs.existsSync(cacheFolder)) {
   fs.mkdirSync(cacheFolder, { recursive: true });
@@ -227,7 +209,31 @@ let Processor = (async (job) => {
   console.log('Processing job', job.id);
 
   let jobJson = '/tmp/job-' + job.id + '.json'
-  await throwsIfAudioFileError(job.data.videoScript[job.data.numberthOfParagraph].audioFilePath);
+  let stdout = '';
+  let stderr = '';
+  await new Promise((resolve, reject) => {
+    let process = spawn('ffprobe', ['-i', job.data.videoScript[job.data.numberthOfParagraph].audioFilePath]);
+    process.stdout.on('data', (data) => {
+      job.log(data.toString());
+      stdout += data.toString();
+    });
+    process.stderr.on('data', (data) => {
+      job.log(data.toString());
+      stderr += data.toString();
+    });
+    process.on('close', (code) => {
+      if (code !== 0) {
+        console.error(`child process exited with code ${code}`);
+        job.log(`child process exited with code ${code}`);
+        reject(`child process exited with code ${code}. Stderr: ${stderr} ${stdout}`);
+      }else{
+        console.log(`child process exited with code ${code}`);
+        job.log(`child process exited with code ${code}`);
+        resolve(stdout);
+      }
+    });
+  });
+  // await throwsIfAudioFileError();
   fs.writeFileSync(jobJson, JSON.stringify(job.data));
   let compositeEngine = job.data.compositeEngine ?? 'composite';
   if (compositeEngine) {
@@ -239,8 +245,8 @@ let Processor = (async (job) => {
   }
   // 
   let script = 'app.py'
-  let stdout = '';
-  let stderr = '';
+  stdout = '';
+  stderr = '';
   await job.log(`python3 ${script} composite ${jobJson}`);
   let articleName = job.data.article.name;
   let articleId = job.data.articleId;
