@@ -5,7 +5,11 @@ const path = require('path');
 console.log('Worker started');
 let queueName = process.env.QUEUE_NAME || 'video-auto-composition';
 let destinateQueueName = process.env.DESTINATE_QUEUE || 'video-auto-composition-result';
+let lockDuration = 20 * 60 * 1000; // 20 minutes
 let opts = {
+  settings: {
+    lockDuration: lockDuration,
+  },
   redis: {
     host: process.env.REDIS_HOST || 'redis',
     port: 6379,
@@ -166,8 +170,8 @@ let Processor = (async (job) => {
   if (job.data.compositeEngine === 'merge') {
     getDestinateQueue(job);
   }
-  let countCompletedJobs = await queue.getCompletedCount();
-  console.log('Successfully merged: ', countCompletedJobs);
+  // let countCompletedJobs = await queue.getCompletedCount();
+  // console.log('Successfully merged: ', countCompletedJobs);
   console.log('Processing job', job.id);
   if (process.env.DEBUG && 0) {
     await new Promise(r => setTimeout(r, Math.random() * 2_000));
@@ -185,18 +189,6 @@ let Processor = (async (job) => {
       }
       let attemptsMade = job.attemptsMade;
       if (isAllJobsExists) {
-        //break;
-        /* let existsJobs = jobs.filter(job => job);
-        for (let existsJob of existsJobs) {
-            if (await existsJob.getState() === 'failed') {
-                try{
-                  await existsJob.retry();
-                }catch(e){
-                  job.log('Failed to retry job ' + existsJob.id + ' with error ' + e.message);
-                }
-            }
-        } */
-      //  await retryJobIds(job, jobIds);
       }else{
         let missingJobsIds = jobIds.filter((_jobId, i) => !jobs[i]);
         let addedLogs = [];
