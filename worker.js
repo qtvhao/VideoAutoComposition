@@ -121,6 +121,8 @@ async function mergeToQueue(job) {
           }
           job.log('Ancestors states: ' + ancestorsStates.join(', ') + ' for ' + ancestorsQueue.name);
         }
+      } else {
+        job.log('All jobs are present, but not all are completed yet.');
       }
     }
   }
@@ -189,6 +191,7 @@ let Processor = (async (job) => {
       }
       let attemptsMade = job.attemptsMade;
       if (isAllJobsExists) {
+        job.log('All jobs exist. Proceeding with processing.');
       }else{
         let missingJobsIds = jobIds.filter((_jobId, i) => !jobs[i]);
         let addedLogs = [];
@@ -215,6 +218,7 @@ let Processor = (async (job) => {
         await new Promise(r => setTimeout(r, 6_000));
         let msg = `Attempts made ${attemptsMade}. Some jobs under ${job.data.articleId} are missing. Retry in 60 seconds. Non-exists jobs: ${missingJobsIds.join(', ')}. Ancestors states: ${addedLogs.join(', ')}`;
         job.log(msg);
+        console.log(msg);
         throw new Error(msg);
       }
   }
@@ -270,12 +274,15 @@ let Processor = (async (job) => {
       });
       process.on('close', (code) => {
         if (code !== 0) {
+          job.log(`child process exited with code ${code}`);
           console.error(`child process exited with code ${code}`);
+          job.log(`Stderr: ${stderr}`);
           console.log('Stderr', stderr);
           return setTimeout(() => {
             return reject(stderr);
           }, 10_000);
         }
+        job.log(`child process exited with code ${code}`);
         console.log(`child process exited with code ${code}`);
         resolve(stdout);
       });
@@ -285,12 +292,16 @@ let Processor = (async (job) => {
     fs.writeFileSync(returnValueInCacheFile, JSON.stringify(returnValue));
     console.log('Stdout', stdout);
     console.log('Stderr', stderr);
+    job.log('Stdout', stdout);
+    job.log('Stderr', stderr);
   }else{
     returnValue = JSON.parse(fs.readFileSync(returnValueInCacheFile));
   }
   if (job.data.compositeEngine === 'merge') {
+    job.log('Merged job', job.id, 'completed with return value', returnValue);
     console.log('Merged job', job.id, 'completed with return value', returnValue);
     let destinateQueue = await getDestinateQueue(job);
+    job.log('Adding destinate job to ' + destinateQueue.name);
     console.log('Adding destinate job to', destinateQueue.name);
     job.log('Adding destinate job to ' + destinateQueue.name);
     job.data.videoScript = job.data.videoScript.map((paragraph) => {
@@ -310,13 +321,16 @@ let Processor = (async (job) => {
     });
   }else{
     console.log('L213: Adding to queue');
+    job.log('Adding to queue');
     mergeToQueue(job);
   }
+  job.log(`On queue ${queue.name} job ${job.id} completed with return value ${JSON.stringify(returnValue)}`);
   console.log("On queue", queue.name, "job", job.id, "completed with return value", returnValue);
   if (job.data.compositeEngine !== 'merge') {
     let jobIds = job.data.videoScript.map((videoScript) => videoScript.jobId);
     await retryJobIds(job, jobIds)
   }
+  job.log('Job completed');
 
   return returnValue;
 });
