@@ -142,7 +142,7 @@ async function throwsIfAudioFileError(audioFilePath) {
     process.on('close', (code) => {
       if (code !== 0) {
         console.error(`child process exited with code ${code}`);
-        return reject(stderr);
+        return reject(`child process exited with code ${code}. Stderr: ${stderr} ${stdout}`);
       }
       console.log(`child process exited with code ${code}`);
       resolve(stdout);
@@ -223,6 +223,7 @@ let Processor = (async (job) => {
       }
   }
   
+  job.log(`Processing job ${job.id}`);
   console.log('Processing job', job.id);
 
   let jobJson = '/tmp/job-' + job.id + '.json'
@@ -230,6 +231,7 @@ let Processor = (async (job) => {
   fs.writeFileSync(jobJson, JSON.stringify(job.data));
   let compositeEngine = job.data.compositeEngine ?? 'composite';
   if (compositeEngine) {
+    job.log(`Composite engine: ${compositeEngine}`);
     console.log('Composite 2 engine', compositeEngine);
   }
   if (fs.existsSync('/tmp/returnvalue.json')) {
