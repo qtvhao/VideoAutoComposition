@@ -144,6 +144,9 @@ async function retryJobIds(job, jobIds) {
       job.log('After processing job ' + job.id + '. Found failed job that needs to be retried ' + existsJob.id);
       try {
         await existsJob.retry();
+        job.log('Retried job ' + existsJob.id);
+        console.log('Retried job ' + existsJob.id);
+        break;
       } catch (e) {
         job.log('Failed to retry job ' + existsJob.id + ' with error ' + e.message);
       }
