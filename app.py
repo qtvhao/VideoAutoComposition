@@ -1,6 +1,7 @@
 # from src.intro import intro
 from src.composite import simple
 from src.captions import one_at_a_time
+import time
 import sys
 import json
 import random
@@ -93,15 +94,15 @@ if __name__ == "__main__":
                     print(f"Copying {sanitizedBaseDirectory + sanitizedFile} to {copied_sanitized_base_directory + sanitizedFile}")
                     shutil.copyfile(sanitizedBaseDirectory + sanitizedFile, copied_sanitized_base_directory + sanitizedFile)
             copied_sanitized_base_directory_time = time.time() - started_at
-            print(f"Copied sanitized base directory in {copied_sanitized_base_directory_time} seconds")
+            print(f"time: Copied sanitized in {copied_sanitized_base_directory_time} seconds")
             # os.system(f"cp -r {sanitizedBaseDirectory} {copied_sanitized_base_directory}")
 
             simple.simple_composite(copied_sanitized_base_directory, copied_audio_file, tmp_output_file)
             composite_time = time.time() - started_at - copied_sanitized_base_directory_time
-            print(f"Composite time: {composite_time}")
+            print(f"time: Composite time: {composite_time}")
             one_at_a_time.one_word_at_a_time(subtitle, copied_audio_file, tmp_output_file, tmp_output_file_captioned)
             caption_time = time.time() - started_at - composite_time - copied_sanitized_base_directory_time
-            print(f"Caption time: {caption_time}")
+            print(f"time: Caption time: {caption_time}")
             shutil.copyfile(tmp_output_file_captioned, output_file)
             print(f"Copied {tmp_output_file_captioned} to {output_file}")
             # clean up
