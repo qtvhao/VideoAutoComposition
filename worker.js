@@ -254,9 +254,9 @@ let Processor = (async (job) => {
   let articleName = job.data.article.name;
   let articleId = job.data.articleId;
   let numberthOfParagraph = job.data.numberthOfParagraph;
-  let cacheKey = `${articleName}_${articleId}_${numberthOfParagraph + 1}-out-of-${job.data.videoScript.length}`;
+  let articleNameSlug = articleName.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+  let cacheKey = `${articleNameSlug}_${articleId}_${numberthOfParagraph + 1}-out-of-${job.data.videoScript.length}`;
   if (job.data.compositeEngine === 'merge') {
-    let articleNameSlug = articleName.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
     cacheKey = `${articleNameSlug}_${articleId}_merged`;
   }
   let returnValue;
