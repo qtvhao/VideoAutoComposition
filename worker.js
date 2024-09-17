@@ -38,7 +38,7 @@ async function getDestinateQueue (job) {
     let destinateQueueIndex = destinateQueueName.split(';').findIndex((queueName) => queueName.split(' | ')[0] === ancestor);
     job.log("Ancestor: " + ancestor + " for queue index " + destinateQueueIndex);
     if (destinateQueueIndex === -1) {
-      throw new Error('Ancestor not found');
+      throw new Error('Ancestor ' + ancestor + ' not found in ' + destinateQueueName);
     }
     return destinateQueues[destinateQueueIndex];
   }
@@ -155,7 +155,7 @@ async function retryJobIds(job, jobIds) {
 }
 let Processor = (async (job) => {
   if (job.data.compositeEngine === 'merge') {
-    getDestinateQueue(job);
+    // getDestinateQueue(job);
   }
   // let countCompletedJobs = await queue.getCompletedCount();
   // console.log('Successfully merged: ', countCompletedJobs);
