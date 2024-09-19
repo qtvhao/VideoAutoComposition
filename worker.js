@@ -167,6 +167,18 @@ let Processor = (async (job) => {
       caption: 'captionPath'
     }
   }
+  let destinateQueue;
+  if (job.data.compositeEngine === 'merge') {
+    destinateQueue = await getDestinateQueue(job);
+  }else{
+    destinateQueue = await getDestinateQueue();
+  }
+  // wait destinate queue to have less than 10 jobs waiting
+  while (await destinateQueue.getWaitingCount() > 0) {
+    job.log('Destinate queue ' + destinateQueue.name + ' has more than 10 jobs waiting. Waiting for 10 seconds');
+    console.log('Destinate queue', destinateQueue.name, 'has more than 10 jobs waiting. Waiting for 10 seconds');
+    await new Promise(r => setTimeout(r, 10_000));
+  }
   if (job.data.compositeEngine !== 'merge') {
       let jobIds = job.data.videoScript.map((videoScript) => videoScript.jobId);
       let jobs = await Promise.all(jobIds.map((jobId) => queue.getJob(jobId)));
