@@ -218,6 +218,13 @@ let Processor = (async (job) => {
         console.log(msg);
         throw new Error(msg);
       }
+      // retry job if failed
+      let thisJob = job;
+      jobs.filter(job => {
+        return job && job.id !== thisJob.id && job.attemptsMade < 2;
+      }).map((job) => {
+        job.retry();
+      });
   }
   
   job.log(`Processing job ${job.id}`);
