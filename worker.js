@@ -220,11 +220,15 @@ let Processor = (async (job) => {
       }
       // retry job if failed
       let thisJob = job;
-      jobs.filter(job => {
+      let retries = (jobs.filter(job => {
         return job && job.id !== thisJob.id && job.attemptsMade < 2;
-      }).map((job) => {
-        job.retry();
-      });
+      }).map((job) => job.retry()));
+      try{
+        await Promise.all(retries);
+      }catch(e){
+        console.error('Failed to retry jobs', e);
+        job.log('Failed to retry jobs ' + e.message);
+      }
   }
   
   job.log(`Processing job ${job.id}`);
