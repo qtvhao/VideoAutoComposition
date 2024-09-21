@@ -122,7 +122,7 @@ async function mergeToQueue(job) {
           job.log('Ancestors states: ' + ancestorsStates.join(', ') + ' for ' + ancestorsQueue.name);
         }
       } else {
-        job.log('All jobs are present, but not all are completed yet.');
+        job.log('All jobs are present, but not all are completed yet. They are ' + jobIds.filter((jobId, i) => !jobs[i].returnvalue).join(', '));
       }
     }
   }
