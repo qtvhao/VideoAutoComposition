@@ -286,6 +286,7 @@ let Processor = (async (job) => {
   let returnValueInCacheFile = path.join(cacheFolder, cacheKey + '.json');
   if (!fs.existsSync(returnValueInCacheFile)) {
     await new Promise((resolve, reject) => {
+      job.log(`python3 ${script} ${compositeEngine} ${jobJson}`);
       let process = spawn('python3', [script, compositeEngine, jobJson]);
       process.stdout.on('data', (data) => {
         stdout += data.toString();
