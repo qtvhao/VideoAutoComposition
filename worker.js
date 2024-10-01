@@ -238,7 +238,9 @@ let Processor = (async (job) => {
   let stdout = '';
   let stderr = '';
   await new Promise((resolve, reject) => {
-    let process = spawn('ffprobe', ['-i', job.data.videoScript[job.data.numberthOfParagraph].audioFilePath]);
+    let audioFilePath = job.data.videoScript[job.data.numberthOfParagraph].audioFilePath;
+    job.log(`ffprobe -i ${audioFilePath}`);
+    let process = spawn('ffprobe', ['-i', audioFilePath]);
     process.stdout.on('data', (data) => {
       job.log(data.toString());
       stdout += data.toString();
