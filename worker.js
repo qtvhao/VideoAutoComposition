@@ -250,11 +250,11 @@ let Processor = (async (job) => {
     process.on('close', (code) => {
       if (code !== 0) {
         console.error(`child process exited with code ${code}`);
-        job.log(`child process exited with code ${code}`);
+        job.log(`child process exited with code 1 ${code}`);
         reject(`child process exited with code ${code}. Stderr: ${stderr} ${stdout}`);
       }else{
         console.log(`child process exited with code ${code}`);
-        job.log(`child process exited with code ${code}`);
+        job.log(`child process exited with code 2 ${code}`);
         resolve(stdout);
       }
     });
@@ -310,7 +310,7 @@ let Processor = (async (job) => {
       });
       process.on('close', (code) => {
         if (code !== 0) {
-          job.log(`child process exited with code ${code}`);
+          job.log(`child process exited with code 3 ${code}`);
           console.error(`child process exited with code ${code}`);
           job.log(`Stderr: ${stderr}`);
           console.log('Stderr', stderr);
@@ -318,7 +318,7 @@ let Processor = (async (job) => {
             return reject(stderr);
           }, 10_000);
         }
-        job.log(`child process exited with code ${code}`);
+        job.log(`child process exited with code 4 ${code}`);
         console.log(`child process exited with code ${code}`);
         resolve(stdout);
       });
