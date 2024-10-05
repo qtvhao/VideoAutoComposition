@@ -278,6 +278,7 @@ let Processor = (async (job) => {
   await job.log(`python3 ${script} composite ${jobJson}`);
   let articleName = job.data.article.name;
   let articleId = job.data.articleId;
+  let secret_key = job.data.secret_key;
   let numberthOfParagraph = job.data.numberthOfParagraph;
   let articleNameSlug = articleName.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
   let cacheKey = `${articleNameSlug}_${articleId}_${numberthOfParagraph + 1}-out-of-${job.data.videoScript.length}`;
@@ -334,6 +335,11 @@ let Processor = (async (job) => {
     job.log('Stderr', stderr);
   }else{
     returnValue = JSON.parse(fs.readFileSync(returnValueInCacheFile));
+  }
+  if (job.data.compositeEngine === 'merge') {
+    await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'final_step', 'secret_key': secret_key,}),});
+  }else{
+    await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'almost_done', 'secret_key': secret_key,}),});
   }
   if (job.data.compositeEngine === 'merge') {
     job.log('Merged job', job.id, 'completed with return value', returnValue);
