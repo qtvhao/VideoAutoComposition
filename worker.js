@@ -5,6 +5,7 @@ const path = require('path');
 console.log('Worker started');
 let queueName = process.env.QUEUE_NAME || 'video-auto-composition';
 let destinateQueueName = process.env.DESTINATE_QUEUE || 'video-auto-composition-result';
+let notifyVideoPromptQueueName = 'notify-video-prompt-queue';
 let lockDuration = 20 * 60 * 1000; // 20 minutes
 let opts = {
   settings: {
@@ -27,7 +28,13 @@ if (destinateQueueName.indexOf(' | ') === -1) {
     return new Queue(queueName.split(' | ')[3], opts);
   })
 }
+let notifyVideoPromptQueue = new Queue(notifyVideoPromptQueueName, opts);
 async function getDestinateQueue (job) {
+  job.log('Getting destinate queue. Job is added by ' + job.data.article.addedBy);
+  if (job.data.article.addedBy === "video-prompt-queue") {
+    return notifyVideoPromptQueue;
+  }
+  // 
   if (job && destinateQueueName.indexOf(' | ') !== -1) {
     console.log('Job data', job.data);
     let article = job.data.article;
