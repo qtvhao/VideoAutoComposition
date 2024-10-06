@@ -12,7 +12,7 @@ import skimage.filters as filters
 
 logs_file = "/tmp/logs.txt"
 output_folder = "/app/assets/outputs/"
-fps = 60
+# fps = 60
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
 def log_color_clip(clip):
@@ -108,6 +108,7 @@ def combine_videos(combined_video_path: str|bool,
                 #    video_concat_mode: VideoConcatMode = VideoConcatMode.random,
                    max_clip_duration: int = 5,
                    threads: int = 2,
+                   fps: int = 60
                    ) -> str:
     audio_clip = moviepy.AudioFileClip(audio_file)
     codec_name = "aac"
@@ -251,7 +252,7 @@ def simple_merge(images_files, output_file):
     final_clip.close()
     return output_file
 
-def simple_composite(image_dir, audio_file, output_file):
+def simple_composite(image_dir, audio_file, output_file, fps: int = 60):
     images_files = [f for f in os.listdir(image_dir) if f.endswith('.mp4')]
     print(images_files)
 
@@ -272,6 +273,6 @@ def simple_composite(image_dir, audio_file, output_file):
 
     # final_clip = moviepy.concatenate_videoclips(clips)
     # final_clip = final_clip.set_audio(moviepy.AudioFileClip(audio_dir + audio_file))
-    return (combine_videos(output_file, [image_dir + image_file for image_file in images_files], audio_file))
+    return combine_videos(output_file, [image_dir + image_file for image_file in images_files], audio_file, 5, 2, fps)
     # final_clip.write_videofile(output_file, codec="libx264", audio_codec="aac")
     # print("Done")

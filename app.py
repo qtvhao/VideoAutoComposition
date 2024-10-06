@@ -46,6 +46,7 @@ if __name__ == "__main__":
     print(f"output_file: {output_file}")
     print(f"audio_file: {audio_file}")
     randomId = random.randbytes(8).hex()
+    addedBy = job["article"]["addedBy"]
     if route == "merge":
         if engine == "simple":
             sequences = job["videoScript"]
@@ -97,7 +98,10 @@ if __name__ == "__main__":
             print(f"time: Copied sanitized in {copied_sanitized_base_directory_time} seconds")
             # os.system(f"cp -r {sanitizedBaseDirectory} {copied_sanitized_base_directory}")
 
-            simple.simple_composite(copied_sanitized_base_directory, copied_audio_file, tmp_output_file)
+            fps = 60
+            if addedBy == "video-prompt-queue":
+                fps = 30
+            simple.simple_composite(copied_sanitized_base_directory, copied_audio_file, tmp_output_file, fps)
             composite_time = time.time() - started_at - copied_sanitized_base_directory_time
             print(f"time: Composite time: {composite_time}")
             one_at_a_time.one_word_at_a_time(subtitle, copied_audio_file, tmp_output_file, tmp_output_file_captioned)
