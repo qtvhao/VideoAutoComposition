@@ -30,9 +30,11 @@ if (destinateQueueName.indexOf(' | ') === -1) {
 }
 let notifyVideoPromptQueue = new Queue(notifyVideoPromptQueueName, opts);
 async function getDestinateQueue (job) {
-  job.log('Getting destinate queue. Job is added by ' + job.data.article.addedBy);
-  if (job.data.article.addedBy === "video-prompt-queue") {
-    return notifyVideoPromptQueue;
+  if (job) {
+    job.log('Getting destinate queue. Job is added by ' + job.data.article.addedBy);
+    if (job.data.article.addedBy === "video-prompt-queue") {
+      return notifyVideoPromptQueue;
+    }
   }
   // 
   if (job && destinateQueueName.indexOf(' | ') !== -1) {
