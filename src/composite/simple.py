@@ -238,7 +238,7 @@ def combine_videos(combined_video_path: str|bool,
 
     return combined_video_path
 
-def simple_merge(images_files, output_file):
+def simple_merge(images_files, output_file, fps: int = 60):
     #print(images_files)
      # images_files = [f for f in os.listdir(image_dir) if f.endswith('.mp4')]
     print(images_files)

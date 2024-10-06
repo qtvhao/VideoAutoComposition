@@ -74,7 +74,7 @@ if __name__ == "__main__":
                 returnvalue({
                     "merged": output_file
                 })
-            simple.simple_merge(copied_composite_files, tmp_output_file)
+            simple.simple_merge(copied_composite_files, tmp_output_file, fps)
             shutil.copyfile(tmp_output_file, output_file)
             print(f"Copied {tmp_output_file} to {output_file}")
             shutil.rmtree(copied_composite_base_directory)
