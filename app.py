@@ -99,9 +99,12 @@ if __name__ == "__main__":
             # os.system(f"cp -r {sanitizedBaseDirectory} {copied_sanitized_base_directory}")
 
             fps = 60
+            preset = "medium"
             if addedBy == "video-prompt-queue":
                 fps = 30
-            simple.simple_composite(copied_sanitized_base_directory, copied_audio_file, tmp_output_file, fps)
+            if addedBy == "video-prompt-queue":
+                preset = "veryfast"
+            simple.simple_composite(copied_sanitized_base_directory, copied_audio_file, tmp_output_file, fps, preset)
             composite_time = time.time() - started_at - copied_sanitized_base_directory_time
             print(f"time: Composite time: {composite_time}")
             one_at_a_time.one_word_at_a_time(subtitle, copied_audio_file, tmp_output_file, tmp_output_file_captioned)

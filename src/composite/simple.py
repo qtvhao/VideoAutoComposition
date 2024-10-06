@@ -108,7 +108,8 @@ def combine_videos(combined_video_path: str|bool,
                 #    video_concat_mode: VideoConcatMode = VideoConcatMode.random,
                    max_clip_duration: int = 5,
                    threads: int = 2,
-                   fps: int = 60
+                   fps: int = 60,
+                   preset: str = "ultrafast"
                    ) -> str:
     audio_clip = moviepy.AudioFileClip(audio_file)
     codec_name = "aac"
@@ -227,7 +228,8 @@ def combine_videos(combined_video_path: str|bool,
                                threads=threads,
                             #    temp_audiofile_path=output_dir,
                             #    audio_codec=codec_name,
-                               fps=fps,
+                                preset=preset,
+                                fps=fps,
                                )
     ended_at = time.time()
     print(f"Process took {ended_at - started_at} seconds")
@@ -252,7 +254,7 @@ def simple_merge(images_files, output_file):
     final_clip.close()
     return output_file
 
-def simple_composite(image_dir, audio_file, output_file, fps: int = 60):
+def simple_composite(image_dir, audio_file, output_file, fps: int = 60, preset: str = "medium"):
     images_files = [f for f in os.listdir(image_dir) if f.endswith('.mp4')]
     print(images_files)
 
@@ -273,6 +275,6 @@ def simple_composite(image_dir, audio_file, output_file, fps: int = 60):
 
     # final_clip = moviepy.concatenate_videoclips(clips)
     # final_clip = final_clip.set_audio(moviepy.AudioFileClip(audio_dir + audio_file))
-    return combine_videos(output_file, [image_dir + image_file for image_file in images_files], audio_file, 5, 2, fps)
+    return combine_videos(output_file, [image_dir + image_file for image_file in images_files], audio_file, 5, 2, fps, preset)
     # final_clip.write_videofile(output_file, codec="libx264", audio_codec="aac")
     # print("Done")
