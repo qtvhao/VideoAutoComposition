@@ -296,6 +296,12 @@ let Processor = (async (job) => {
   }
   let returnValue;
   let returnValueInCacheFile = path.join(cacheFolder, cacheKey + '.json');
+  if (job.data.compositeEngine === 'merge') {
+    await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'exporting', 'secret_key': secret_key,}),});
+  }else{
+    await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'final reviewing ' + (numberthOfParagraph + 1) + ' out of ' + job.data.videoScript.length, 'secret_key': secret_key,}),});
+  }
+
   if (!fs.existsSync(returnValueInCacheFile)) {
     await new Promise((resolve, reject) => {
       job.log(`python3 ${script} ${compositeEngine} ${jobJson}`);
@@ -345,11 +351,7 @@ let Processor = (async (job) => {
   }else{
     returnValue = JSON.parse(fs.readFileSync(returnValueInCacheFile));
   }
-  if (job.data.compositeEngine === 'merge') {
-    await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'finalizing', 'secret_key': secret_key,}),});
-  }else{
-    await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'exporting', 'secret_key': secret_key,}),});
-  }
+
   if (job.data.compositeEngine === 'merge') {
     job.log('Merged job', job.id, 'completed with return value', returnValue);
     console.log('Merged job', job.id, 'completed with return value', returnValue);
