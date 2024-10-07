@@ -346,9 +346,9 @@ let Processor = (async (job) => {
     returnValue = JSON.parse(fs.readFileSync(returnValueInCacheFile));
   }
   if (job.data.compositeEngine === 'merge') {
-    await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'final_step', 'secret_key': secret_key,}),});
+    await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'finalizing', 'secret_key': secret_key,}),});
   }else{
-    await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'almost_done', 'secret_key': secret_key,}),});
+    await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'exporting', 'secret_key': secret_key,}),});
   }
   if (job.data.compositeEngine === 'merge') {
     job.log('Merged job', job.id, 'completed with return value', returnValue);
