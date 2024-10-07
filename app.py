@@ -52,8 +52,13 @@ if __name__ == "__main__":
     if addedBy == "video-prompt-queue":
         fps = 30
     if addedBy == "video-prompt-queue":
-        preset = "veryfast"
+        preset = "ultrafast"
+    # ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow
 
+    # print to console
+    print(f"preset: {preset}")
+    print(f"fps: {fps}")
+    print(f"addedBy: {addedBy}")
     if route == "merge":
         if engine == "simple":
             sequences = job["videoScript"]
