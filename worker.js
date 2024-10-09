@@ -297,9 +297,9 @@ let Processor = (async (job) => {
   let returnValue;
   let returnValueInCacheFile = path.join(cacheFolder, cacheKey + '.json');
   if (job.data.compositeEngine === 'merge') {
-    await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'exporting', 'secret_key': secret_key,}),});
+    await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'exporting', 'secret_key': secret_key, 'prompt': job.data.article.name,}),});
   }else{
-    await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'final reviewing ' + (numberthOfParagraph + 1) + ' out of ' + job.data.videoScript.length, 'secret_key': secret_key,}),});
+    await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'final reviewing ' + (numberthOfParagraph + 1) + ' out of ' + job.data.videoScript.length, 'prompt': job.data.article.name, 'secret_key': secret_key,}),});
   }
 
   if (!fs.existsSync(returnValueInCacheFile)) {
