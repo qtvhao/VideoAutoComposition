@@ -312,6 +312,7 @@ let Processor = (async (job) => {
         console.log(data.toString());
       });
       let progress = 0
+      let part
       process.stderr.on('data', (data) => {
         stderr += data.toString();
         if (data.toString().indexOf('%') !== -1) {
@@ -323,7 +324,12 @@ let Processor = (async (job) => {
           // if the percentage is different, update the progress
           progress = percentage;
           job.progress(Number(percentage));
-          let part = Math.min(Math.floor(percentage / 20), 4);
+          // 
+          let updated_part = Math.min(Math.floor(percentage / 20), 4);
+          if (updated_part === part) {
+            return;
+          }
+          part = updated_part;
           // new Regex('final reviewing (\\d+) out of (\\d+) (\\d+)/5')
           if (job.data.compositeEngine === 'merge') {
             fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({
