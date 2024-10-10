@@ -317,10 +317,27 @@ let Processor = (async (job) => {
         if (data.toString().indexOf('%') !== -1) {
           let percentage = data.toString().match(/\d+/)[0];
           if (percentage === progress) {
+            // check if the percentage is the same as the previous one
             return;
           }
+          // if the percentage is different, update the progress
           progress = percentage;
           job.progress(Number(percentage));
+          let part = Math.min(Math.floor(percentage / 20), 4);
+          // new Regex('final reviewing (\\d+) out of (\\d+) (\\d+)/5')
+          if (job.data.compositeEngine === 'merge') {
+            fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({
+              'status': 'exporting ' + (part + 1) + '/5',
+              'prompt': job.data.article.name,
+              'secret_key': secret_key,
+            }),});
+          }else{
+            fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({
+              'status': 'final reviewing ' + (numberthOfParagraph + 1) + ' out of ' + job.data.videoScript.length + ' ' + (part + 1) + '/5',
+              'prompt': job.data.article.name,
+              'secret_key': secret_key,
+            }),});
+          }
         }else{
           job.log(data.toString());
           console.error(`stderr: ${data}`);
