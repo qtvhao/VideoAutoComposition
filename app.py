@@ -34,14 +34,15 @@ if __name__ == "__main__":
     audio_file = paragraph["audioFilePath"]
     engine = "simple"
     # print(f"job: {job}")
-    jobId = "" + job["articleId"] + paragraph["jobId"]
+    jobId = "" + paragraph["jobId"]
 
     composite_sequences = "/app/storage/images/composite-sequences/"
     if not os.path.exists(composite_sequences):
         os.makedirs(composite_sequences)
 
-    output_file = composite_sequences + "composite-" + engine + "-" + jobId + ".mp4"
+    output_file = composite_sequences + "composite-" + engine + "-" + job["articleId"] + "-" + jobId + ".mp4"
     print(f"route: {route}")
+    print(f"articleId: {job['articleId']}")
     print(f"engine: {engine}")
     print(f"output_file: {output_file}")
     print(f"audio_file: {audio_file}")
