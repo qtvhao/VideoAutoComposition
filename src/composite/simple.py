@@ -224,6 +224,9 @@ def combine_videos(combined_video_path: str|bool,
     if not combined_video_path:
         return video_clip
     started_at = time.time()
+    if preset == "ultrafast":
+        new_size = "1280x720" # this is HD resolution
+        video_clip = video_clip.resize(newsize=new_size)
     video_clip.write_videofile(filename=combined_video_path,
                                threads=threads,
                             #    temp_audiofile_path=output_dir,
