@@ -34,7 +34,7 @@ if __name__ == "__main__":
     audio_file = paragraph["audioFilePath"]
     engine = "simple"
     # print(f"job: {job}")
-    jobId = "" + paragraph["jobId"]
+    jobId = "" + job["articleId"] + paragraph["jobId"]
 
     composite_sequences = "/app/storage/images/composite-sequences/"
     if not os.path.exists(composite_sequences):
