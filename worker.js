@@ -6,6 +6,7 @@ console.log('Worker started');
 let queueName = process.env.QUEUE_NAME || 'video-auto-composition';
 let destinateQueueName = process.env.DESTINATE_QUEUE || 'video-auto-composition-result';
 let notifyVideoPromptQueueName = 'notify-video-prompt-queue';
+let http = require('http');
 let lockDuration = 20 * 60 * 1000; // 20 minutes
 let opts = {
   settings: {
@@ -297,9 +298,23 @@ let Processor = (async (job) => {
   let returnValue;
   let returnValueInCacheFile = path.join(cacheFolder, cacheKey + '.json');
   if (job.data.compositeEngine === 'merge') {
-    await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'exporting', 'secret_key': secret_key, 'prompt': job.data.article.name,}),});
+    http.request({
+      host: 'distributor-api',
+      port: 80,
+      path: '/',
+      method: 'POST',
+      headers: {'Content-Type': 'application/json',},
+    }).end(JSON.stringify({ 'status': 'exporting', 'prompt': job.data.article.name, 'secret_key': secret_key,}));
+    // await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'exporting', 'secret_key': secret_key, 'prompt': job.data.article.name,}),});
   }else{
-    await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'final reviewing ' + (numberthOfParagraph + 1) + ' out of ' + job.data.videoScript.length, 'prompt': job.data.article.name, 'secret_key': secret_key,}),});
+    http.request({
+      host: 'distributor-api',
+      port: 80,
+      path: '/',
+      method: 'POST',
+      headers: {'Content-Type': 'application/json',},
+    }).end(JSON.stringify({ 'status': 'final reviewing ' + (numberthOfParagraph + 1) + ' out of ' + job.data.videoScript.length, 'prompt': job.data.article.name, 'secret_key': secret_key,}));
+    // await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'final reviewing ' + (numberthOfParagraph + 1) + ' out of ' + job.data.videoScript.length, 'prompt': job.data.article.name, 'secret_key': secret_key,}),});
   }
 
   if (!fs.existsSync(returnValueInCacheFile)) {
