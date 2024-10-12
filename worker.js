@@ -305,7 +305,6 @@ let Processor = (async (job) => {
       method: 'POST',
       headers: {'Content-Type': 'application/json',},
     }).end(JSON.stringify({ 'status': 'exporting', 'prompt': job.data.article.name, 'secret_key': secret_key,}));
-    // await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'exporting', 'secret_key': secret_key, 'prompt': job.data.article.name,}),});
   }else{
     http.request({
       host: 'distributor-api',
@@ -314,7 +313,6 @@ let Processor = (async (job) => {
       method: 'POST',
       headers: {'Content-Type': 'application/json',},
     }).end(JSON.stringify({ 'status': 'final reviewing ' + (numberthOfParagraph + 1) + ' out of ' + job.data.videoScript.length, 'prompt': job.data.article.name, 'secret_key': secret_key,}));
-    // await fetch('http://distributor-api:80/', { method: 'POST', headers: {'Content-Type': 'application/json',}, body: JSON.stringify({ 'status': 'final reviewing ' + (numberthOfParagraph + 1) + ' out of ' + job.data.videoScript.length, 'prompt': job.data.article.name, 'secret_key': secret_key,}),});
   }
 
   if (!fs.existsSync(returnValueInCacheFile)) {
@@ -413,6 +411,10 @@ let Processor = (async (job) => {
       maxStalledCount: 0,
     });
   }else{
+    await notifyVideoPromptQueue.add({
+      ...job.data,
+      merged: returnValue,
+    });
     console.log('L213: Adding to queue');
     job.log('Adding to queue');
     mergeToQueue(job);
