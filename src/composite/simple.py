@@ -230,6 +230,7 @@ def combine_videos(combined_video_path: str|bool,
         video_clip = video_clip.resize(newsize=new_size)
     video_clip.write_videofile(filename=combined_video_path,
                                threads=threads,
+                               audio_codec="aac",
                             #    temp_audiofile_path=output_dir,
                             #    audio_codec=codec_name,
                                 preset=preset,
