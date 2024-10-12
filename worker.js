@@ -413,9 +413,7 @@ let Processor = (async (job) => {
   }else{
     await notifyVideoPromptQueue.add({
       ...job.data,
-      merged: {
-        merged: returnValue.caption,
-      },
+      partial_completed: returnValue,
     });
     console.log('L213: Adding to queue');
     job.log('Adding to queue');
