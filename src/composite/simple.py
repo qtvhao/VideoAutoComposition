@@ -243,15 +243,18 @@ def combine_videos(combined_video_path: str|bool,
 
     return combined_video_path
 
-def simple_merge(images_files, output_file, fps: int = 60, preset: str = "medium"):
-    #print(images_files)
-     # images_files = [f for f in os.listdir(image_dir) if f.endswith('.mp4')]
+def simple_merge(images_files, output_file, fps: int = 60, preset: str = "medium", audio_file=None):
     print(images_files)
     clips = []
     for image_file in images_files:
         clip = moviepy.VideoFileClip(image_file)
         clips.append(clip)
     final_clip = moviepy.concatenate_videoclips(clips)
+    
+    if audio_file:
+        audio_clip = moviepy.AudioFileClip(audio_file)
+        final_clip = final_clip.set_audio(audio_clip)
+    
     final_clip.write_videofile(filename=output_file,
                             audio_codec="aac",
                             preset=preset,
