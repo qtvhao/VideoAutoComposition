@@ -288,17 +288,18 @@ let Processor = (async (job) => {
   stderr = '';
   await job.log(`python3 ${script} composite ${jobJson}`);
   let articleName = job.data.article.name;
-  let articleId = job.data.articleId;
+  // let articleId = job.data.articleId;
   let secret_key = job.data.secret_key;
   let numberthOfParagraph = job.data.numberthOfParagraph;
-  let articleNameSlug = articleName.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
-  let cacheKey = `${articleNameSlug}_${articleId}_${numberthOfParagraph + 1}-out-of-${job.data.videoScript.length}`;
+  // let articleNameSlug = articleName.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+  let cacheKey = `${articleName}_${numberthOfParagraph + 1}-out-of-${job.data.videoScript.length}`;
   if (job.data.compositeEngine === 'merge') {
-    cacheKey = `${articleNameSlug}_${articleId}_merged`;
+    cacheKey = `${articleName}_merged`;
   }
   cacheKey = djb2(cacheKey);
   let returnValue;
   let returnValueInCacheFile = path.join(cacheFolder, cacheKey + '.json');
+  job.log(articleName + ', ' + numberthOfParagraph + ', ' + job.data.videoScript.length);
   job.log('Cache file: ' + returnValueInCacheFile);
   job.log('Cache exists: ' + fs.existsSync(returnValueInCacheFile));
   if (job.data.compositeEngine === 'merge') {
