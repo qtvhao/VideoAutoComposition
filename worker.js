@@ -163,6 +163,7 @@ async function retryJobIds(job, jobIds) {
     }
   }
 }
+function djb2(str) { let hash = 5381; for (let i = 0; i < str.length; i++) { hash = ((hash << 5) + hash) + str.charCodeAt(i); } return hash; }
 let Processor = (async (job) => {
   if (job.data.compositeEngine === 'merge') {
     // getDestinateQueue(job);
@@ -295,8 +296,11 @@ let Processor = (async (job) => {
   if (job.data.compositeEngine === 'merge') {
     cacheKey = `${articleNameSlug}_${articleId}_merged`;
   }
+  cacheKey = djb2(cacheKey);
   let returnValue;
   let returnValueInCacheFile = path.join(cacheFolder, cacheKey + '.json');
+  job.log('Cache file: ' + returnValueInCacheFile);
+  job.log('Cache exists: ' + fs.existsSync(returnValueInCacheFile));
   if (job.data.compositeEngine === 'merge') {
     http.request({
       host: 'distributor-api',
